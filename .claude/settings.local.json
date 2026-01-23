@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(forge test:*)",
+      "Bash(forge build:*)",
+      "Bash(source .env)",
+      "Bash(forge script:*)",
+      "Bash(tee:*)",
+      "Bash(export PRIVATE_KEY=710bef627f4735faedc7a44f37d9ac30ee537d1cec5570c966be42feeb62b534)",
+      "Bash(cast call:*)",
+      "Bash(cast balance:*)",
+      "Bash(cast basefee:*)",
+      "Bash(cast gas-price:*)",
+      "Bash(cast code:*)",
+      "Bash(cast:*)"
+    ]
+  }
+}

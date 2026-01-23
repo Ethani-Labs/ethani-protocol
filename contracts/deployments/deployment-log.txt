@@ -1,0 +1,168 @@
+No files changed, compilation skipped
+Traces:
+  [5816621] → new DeployAll@0x9f7cF1d1F558E57ef88a59ac3D47214eF25B6A06
+    └─ ← [Return] 28937 bytes of code
+
+  [4923780] DeployAll::run()
+    ├─ [0] VM::envUint("PRIVATE_KEY") [staticcall]
+    │   └─ ← [Return] <env var value>
+    ├─ [0] VM::addr(<pk>) [staticcall]
+    │   └─ ← [Return] 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e
+    ├─ [0] console::log("\n========== ETHANI DEPLOYMENT STARTING ==========") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("Deployer:", 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("Chain ID:", 421614 [4.216e5]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("=================================================\n") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] VM::startBroadcast(<pk>)
+    │   └─ ← [Return]
+    ├─ [0] console::log("Deploying simple contracts...") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [305950] → new EthaniPricing@0xc92fd01c122821Eb2C911d16468B20b07E25abC0
+    │   └─ ← [Return] 1528 bytes of code
+    ├─ [0] console::log("[1/5] EthaniPricing deployed at:", EthaniPricing: [0xc92fd01c122821Eb2C911d16468B20b07E25abC0]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [601563] → new EthaniRegion@0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143
+    │   └─ ← [Return] 2883 bytes of code
+    ├─ [0] console::log("[2/5] EthaniRegion deployed at:", EthaniRegion: [0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [689444] → new EthaniIncentive@0xE6C246d7Ba92c4d35076C91B686d104ad3118172
+    │   └─ ← [Return] 3333 bytes of code
+    ├─ [0] console::log("[3/5] EthaniIncentive deployed at:", EthaniIncentive: [0xE6C246d7Ba92c4d35076C91B686d104ad3118172]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("\nDeploying core infrastructure...") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [833677] → new EthaniCore@0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4
+    │   ├─ emit RoleGranted(role: 0x0000000000000000000000000000000000000000000000000000000000000000, account: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e, sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   ├─ emit RoleGranted(role: 0x58a091b35f80bf54631090022328af78163c65b6b8fe6a4f19b69534d179fed0, account: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e, sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   └─ ← [Return] 3919 bytes of code
+    ├─ [0] console::log("[4/5] EthaniCore deployed at:", EthaniCore: [0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [2111613] → new PriceOracle@0x139a3036052761341212C7d06488C27fb000a167
+    │   ├─ emit RoleGranted(role: 0x0000000000000000000000000000000000000000000000000000000000000000, account: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e, sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   ├─ emit RoleGranted(role: 0xd96ba01d6560c2ab35f2940dd8d70c5f5fe06236c72674237120515918198fb0, account: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e, sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   ├─ emit RoleGranted(role: 0xbf233dd2aafeb4d50879c4aa5c81e96d92f6e6945c906a58f9f2d1c1631b4b26, account: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e, sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   ├─ emit RoleGranted(role: 0x3b49a237fe2d18fa4d9642b8a0e065923cceb71b797783b619a030a61d848bf0, account: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e, sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   └─ ← [Return] 9284 bytes of code
+    ├─ [0] console::log("[5/5] PriceOracle deployed at:", PriceOracle: [0x139a3036052761341212C7d06488C27fb000a167]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("\nConfiguring contracts...") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [502] EthaniCore::DATA_UPDATER_ROLE() [staticcall]
+    │   └─ ← [Return] 0x58a091b35f80bf54631090022328af78163c65b6b8fe6a4f19b69534d179fed0
+    ├─ [27200] EthaniCore::grantRole(0x58a091b35f80bf54631090022328af78163c65b6b8fe6a4f19b69534d179fed0, PriceOracle: [0x139a3036052761341212C7d06488C27fb000a167])
+    │   ├─ emit RoleGranted(role: 0x58a091b35f80bf54631090022328af78163c65b6b8fe6a4f19b69534d179fed0, account: PriceOracle: [0x139a3036052761341212C7d06488C27fb000a167], sender: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   └─ ← [Stop]
+    ├─ [0] console::log("- Granted DATA_UPDATER_ROLE to PriceOracle") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [1080] PriceOracle::PRICE_UPDATER_ROLE() [staticcall]
+    │   └─ ← [Return] 0xd96ba01d6560c2ab35f2940dd8d70c5f5fe06236c72674237120515918198fb0
+    ├─ [3180] PriceOracle::grantRole(0xd96ba01d6560c2ab35f2940dd8d70c5f5fe06236c72674237120515918198fb0, 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e)
+    │   └─ ← [Return]
+    ├─ [0] console::log("- Granted PRICE_UPDATER_ROLE to deployer") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [141589] EthaniCore::createRegion("Sample Region", 1000000000000000000000 [1e21])
+    │   ├─ emit RegionCreated(regionId: 0, name: "Sample Region", basePrice: 1000000000000000000000 [1e21], timestamp: 1769157028 [1.769e9])
+    │   └─ ← [Stop]
+    ├─ [0] console::log("- Created sample region with base price 1000") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] VM::stopBroadcast()
+    │   └─ ← [Return]
+    ├─ [0] console::log("\n========== ETHANI DEPLOYMENT SUCCESSFUL ==========") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("Simple Contracts:") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("  EthaniPricing:   ", EthaniPricing: [0xc92fd01c122821Eb2C911d16468B20b07E25abC0]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("  EthaniRegion:    ", EthaniRegion: [0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("  EthaniIncentive: ", EthaniIncentive: [0xE6C246d7Ba92c4d35076C91B686d104ad3118172]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("\nCore Infrastructure:") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("  EthaniCore:      ", EthaniCore: [0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("  PriceOracle:     ", PriceOracle: [0x139a3036052761341212C7d06488C27fb000a167]) [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("==================================================") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("\n========== NEXT STEPS ====================") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("1. Save contract addresses to your .env file") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("2. Verify contracts on block explorer (if --verify used)") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("3. Test price calculation:") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("   - Update region data: coreContract.updateRegionData(0, supply, demand)") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("   - Calculate price: oracleContract.updatePrice(0)") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("4. Integrate with backend API") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] console::log("==========================================\n") [staticcall]
+    │   └─ ← [Stop]
+    ├─ [0] VM::toString(421614 [4.216e5]) [staticcall]
+    │   └─ ← [Return] "421614"
+    ├─ [0] VM::toString(0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e) [staticcall]
+    │   └─ ← [Return] "0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e"
+    ├─ [0] VM::toString(EthaniPricing: [0xc92fd01c122821Eb2C911d16468B20b07E25abC0]) [staticcall]
+    │   └─ ← [Return] "0xc92fd01c122821Eb2C911d16468B20b07E25abC0"
+    ├─ [0] VM::toString(EthaniRegion: [0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143]) [staticcall]
+    │   └─ ← [Return] "0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143"
+    ├─ [0] VM::toString(EthaniIncentive: [0xE6C246d7Ba92c4d35076C91B686d104ad3118172]) [staticcall]
+    │   └─ ← [Return] "0xE6C246d7Ba92c4d35076C91B686d104ad3118172"
+    ├─ [0] VM::toString(EthaniCore: [0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4]) [staticcall]
+    │   └─ ← [Return] "0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4"
+    ├─ [0] VM::toString(PriceOracle: [0x139a3036052761341212C7d06488C27fb000a167]) [staticcall]
+    │   └─ ← [Return] "0x139a3036052761341212C7d06488C27fb000a167"
+    ├─ [0] VM::writeFile("deployments/latest.txt", "# ETHANI Contract Addresses\n# Deployed on chain: 421614\n# Deployer: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e\n\nETHANI_PRICING_ADDRESS=0xc92fd01c122821Eb2C911d16468B20b07E25abC0\nETHANI_REGION_ADDRESS=0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143\nETHANI_INCENTIVE_ADDRESS=0xE6C246d7Ba92c4d35076C91B686d104ad3118172\nETHANI_CORE_ADDRESS=0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4\nETHANI_PRICE_ORACLE_ADDRESS=0x139a3036052761341212C7d06488C27fb000a167\n")
+    │   └─ ← [Revert] vm.writeFile: the path deployments/latest.txt is not allowed to be accessed for write operations
+    └─ ← [Revert] vm.writeFile: the path deployments/latest.txt is not allowed to be accessed for write operations
+
+
+
+== Logs ==
+  
+========== ETHANI DEPLOYMENT STARTING ==========
+  Deployer: 0x02cE05049D7A1dAEb7987CA9Ed5104003E7B778e
+  Chain ID: 421614
+  =================================================
+
+  Deploying simple contracts...
+  [1/5] EthaniPricing deployed at: 0xc92fd01c122821Eb2C911d16468B20b07E25abC0
+  [2/5] EthaniRegion deployed at: 0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143
+  [3/5] EthaniIncentive deployed at: 0xE6C246d7Ba92c4d35076C91B686d104ad3118172
+  
+Deploying core infrastructure...
+  [4/5] EthaniCore deployed at: 0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4
+  [5/5] PriceOracle deployed at: 0x139a3036052761341212C7d06488C27fb000a167
+  
+Configuring contracts...
+  - Granted DATA_UPDATER_ROLE to PriceOracle
+  - Granted PRICE_UPDATER_ROLE to deployer
+  - Created sample region with base price 1000
+  
+========== ETHANI DEPLOYMENT SUCCESSFUL ==========
+  Simple Contracts:
+    EthaniPricing:    0xc92fd01c122821Eb2C911d16468B20b07E25abC0
+    EthaniRegion:     0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143
+    EthaniIncentive:  0xE6C246d7Ba92c4d35076C91B686d104ad3118172
+  
+Core Infrastructure:
+    EthaniCore:       0x05aF2330e286197e4A2304fd708Aa333AB3ACDE4
+    PriceOracle:      0x139a3036052761341212C7d06488C27fb000a167
+  ==================================================
+  
+========== NEXT STEPS ====================
+  1. Save contract addresses to your .env file
+  2. Verify contracts on block explorer (if --verify used)
+  3. Test price calculation:
+     - Update region data: coreContract.updateRegionData(0, supply, demand)
+     - Calculate price: oracleContract.updatePrice(0)
+  4. Integrate with backend API
+  ==========================================
+
+Error: script failed: vm.writeFile: the path deployments/latest.txt is not allowed to be accessed for write operations
