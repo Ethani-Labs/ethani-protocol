@@ -1,45 +1,45 @@
 # Hybrid Architecture: Stylus + Solidity Design
 
-**ETHANI menggunakan arsitektur dua-layer:** Stylus untuk komputasi deterministik harga, Solidity untuk enforcemet dan governance. Desain ini memaksimalkan kecepatan, efisiensi gas, dan auditability sambil mempertahankan kendali manusia atas sistem.
+**ETHANI uses a two-layer architecture:** Stylus for deterministic price computation, Solidity for enforcement and governance. This design maximizes speed, gas efficiency, and auditability while maintaining human control over the system.
 
 ---
 
-## Filosofi Desain
+## Design Philosophy
 
-### Separation of Concerns (Pemisahan Tanggung Jawab)
+### Separation of Concerns
 
-**Stylus (Layer Komputasi):**
-- Pure computation (komputasi murni)
-- Deterministic pricing logic (logika harga deterministik)
-- No state access (tidak akses state)
-- No external calls (tidak ada external calls)
-- Fast execution (eksekusi cepat)
-- Low cost (biaya rendah)
+**Stylus (Computation Layer):**
+- Pure computation
+- Deterministic pricing logic
+- No state access
+- No external calls
+- Fast execution
+- Low cost
 
-**Solidity (Layer Governance):**
-- State management (manajemen state)
-- Access control (kontrol akses)
-- Result enforcement (enforcemet hasil)
-- On-chain audit trail (catatan audit on-chain)
-- Fallback logic (logika fallback)
-- Policy governance (governance kebijakan)
+**Solidity (Governance Layer):**
+- State management
+- Access control
+- Result enforcement
+- On-chain audit trail
+- Fallback logic
+- Policy governance
 
-### Mengapa Dual-Layer?
+### Why Dual-Layer?
 
-| Kebutuhan | Solidity EVM | Stylus WASM | Keputusan |
+| Requirement | Solidity EVM | Stylus WASM | Decision |
 |-----------|--------------|-------------|----------|
-| Kecepatan | Lambat (15-20s) | Cepat (1-2s) | Gunakan Stylus |
-| Biaya gas | Mahal ($0.25) | Murah ($0.01) | Gunakan Stylus |
-| Determinism | Tergantung presisi float | Native deterministic | Gunakan Stylus |
-| Storage | Diperlukan | Tidak diperlukan | Gunakan Solidity |
-| Governance | Fleksibel | Immutable bytecode | Gunakan Solidity |
-| Audit trail | Event logs | Tidak bisa emit | Gunakan Solidity |
+| Speed | Slow (15-20s) | Fast (1-2s) | Use Stylus |
+| Gas cost | Expensive ($0.25) | Cheap ($0.01) | Use Stylus |
+| Determinism | Float precision dependent | Native deterministic | Use Stylus |
+| Storage | Required | Not required | Use Solidity |
+| Governance | Flexible | Immutable bytecode | Use Solidity |
+| Audit trail | Event logs | Cannot emit | Use Solidity |
 
-**Kesimpulan:** Stylus untuk komputasi harga (cepat, murah, deterministik). Solidity untuk state dan governance (fleksibel, auditable, overrideable).
+**Conclusion:** Stylus for price computation (fast, cheap, deterministic). Solidity for state and governance (flexible, auditable, overrideable).
 
 ---
 
-## Arsitektur Lengkap
+## Complete Architecture
 
 ### Layer Stack
 
@@ -80,15 +80,15 @@
 
 ## Layer 1: Stylus (Rust/WASM Computation Engine)
 
-### Purpose (Tujuan)
+### Purpose
 
-Menghitung harga deterministik dengan cepat dan murah. Satu-satunya tanggung jawab: input supply/demand → output price.
+Calculate deterministic prices quickly and cheaply. Single responsibility: input supply/demand → output price.
 
-### Karakteristik
+### Characteristics
 
-| Aspek | Detail |
+| Aspect | Detail |
 |-------|--------|
-| **Bahasa** | Rust |
+| **Language** | Rust |
 | **Target** | WASM (WebAssembly) |
 | **Blockchain** | Arbitrum One |
 | **Contract** | EthaniPricingStyleus (0xf174bC...) |
@@ -98,7 +98,7 @@ Menghitung harga deterministik dengan cepat dan murah. Satu-satunya tanggung jaw
 | **Speed** | 1-2 seconds |
 | **Gas Cost** | ~2,500 gas (≈ $0.01) |
 
-### Kode Logic (Pseudocode)
+### Logic Code (Pseudocode)
 
 ```rust
 pub fn calculate_price(
@@ -140,34 +140,34 @@ pub fn calculate_price(
 }
 ```
 
-### Keuntungan Stylus
+### Stylus Advantages
 
-1. **Deterministic:** WASM bytecode menghasilkan hasil identik di semua platform
-2. **Fast:** 10x lebih cepat dari Solidity EVM
-3. **Cheap:** 90% lebih murah gas daripada Solidity
+1. **Deterministic:** WASM bytecode produces identical results across all platforms
+2. **Fast:** 10x faster than Solidity EVM
+3. **Cheap:** 90% cheaper gas than Solidity
 4. **Auditable:** WASM bytecode queryable on-chain, source code public on GitHub
-5. **Pure:** Tidak ada side effects, tidak ada external dependencies
+5. **Pure:** No side effects, no external dependencies
 
-### Keterbatasan Stylus
+### Stylus Limitations
 
-- Tidak bisa access storage (state)
-- Tidak bisa emit events
-- Tidak bisa change global state
-- **Solusi:** Gunakan Solidity sebagai wrapper untuk state + events
+- Cannot access storage (state)
+- Cannot emit events
+- Cannot change global state
+- **Solution:** Use Solidity as wrapper for state + events
 
 ---
 
 ## Layer 2: Solidity (Governance & Enforcement)
 
-### Purpose (Tujuan)
+### Purpose
 
-Enforce hasil Stylus, manage state, provide fallback, emit audit trail. Layer ini adalah "brain" yang bisa override jika diperlukan policy change.
+Enforce Stylus results, manage state, provide fallback, emit audit trail. This layer is the "brain" that can override if policy changes are needed.
 
-### Karakteristik
+### Characteristics
 
-| Aspek | Detail |
+| Aspect | Detail |
 |-------|--------|
-| **Bahasa** | Solidity 0.8.20 |
+| **Language** | Solidity 0.8.20 |
 | **Blockchain** | Arbitrum One |
 | **Contract** | EthaniPricing (0xc92fd01c...) |
 | **Determinism** | ✅ Identical logic as Stylus |
@@ -178,7 +178,7 @@ Enforce hasil Stylus, manage state, provide fallback, emit audit trail. Layer in
 
 ### Core Functions
 
-#### 1. Coordination dengan Stylus
+#### 1. Coordination with Stylus
 
 ```solidity
 function getPrice(
@@ -313,12 +313,12 @@ function updateTierThreshold(uint256 tierIndex, uint256 newThreshold)
 }
 ```
 
-### Keuntungan Solidity Layer
+### Solidity Layer Advantages
 
-1. **Governance:** Bisa update rules tanpa recompile smart contract
-2. **Audit Trail:** Event logs mencatat semua keputusan
-3. **Fallback:** Jika Stylus fail, Solidity mengambil alih
-4. **Flexibility:** Manusia bisa override jika emergency
+1. **Governance:** Can update rules without recompiling smart contract
+2. **Audit Trail:** Event logs record all decisions
+3. **Fallback:** If Stylus fails, Solidity takes over
+4. **Flexibility:** Humans can override if emergency
 
 ---
 
@@ -421,7 +421,7 @@ Price calculation     │ 2,500 gas │ 25,000 gas│ 90%
 Monthly (1M calls)    │ $30,000   │ $300,000  │ 90%
 Regional coverage     │ Affordable│ Expensive │ 10x
 
-Conclusion: Stylus membuat pricing accessible untuk economies berkembang
+Conclusion: Stylus makes pricing accessible for developing economies
 ```
 
 ### Fallback Cost (Per Year)
@@ -444,7 +444,7 @@ Without Stylus (Solidity only): $7,875,000
 
 ### Trace Pricing Decision
 
-Siapa saja bisa verify pricing decision dengan:
+Anyone can verify a pricing decision with:
 
 ```bash
 # 1. Get on-chain data
@@ -475,7 +475,7 @@ Status: ✓ VERIFIED
 | Offline reproducible | ⚠️ WASM hard | ⚠️ EVM hard | ✅ Easy |
 | No hidden params | ✅ Yes | ✅ Yes | ✅ Yes |
 
-**Result:** Setiap pricing decision fully auditable dan reproducible offline.
+**Result:** Every pricing decision is fully auditable and reproducible offline.
 
 ---
 
@@ -483,7 +483,7 @@ Status: ✓ VERIFIED
 
 ### Stylus + Arbitrum Alignment
 
-| Kebutuhan ETHANI | Solusi Arbitrum |
+| ETHANI Requirement | Arbitrum Solution |
 |------------------|-----------------|
 | Deterministic computation | WASM (naturally deterministic) |
 | Cost-effective ($0.01 per calc) | 90% cheaper than mainnet |
@@ -491,16 +491,16 @@ Status: ✓ VERIFIED
 | Policy-grade infrastructure | Arbitrum's sustainability focus |
 | Regional autonomy | Arbitrum Orbit (2027+) |
 
-### Mengapa Tidak Chain Lain?
+### Why Not Other Chains?
 
 | Chain | Issue |
 |-------|-------|
-| Ethereum Mainnet | Terlalu mahal ($10+ per transaction) |
-| Solana | Tidak fokus pada determinism, lebih untuk trading |
-| Polygon | Tidak ada Stylus equivalent (WASM support) |
-| Mantle | Tidak aligned dengan vision jangka panjang |
+| Ethereum Mainnet | Too expensive ($10+ per transaction) |
+| Solana | Not focused on determinism, more for trading |
+| Polygon | No Stylus equivalent (WASM support) |
+| Mantle | Not aligned with long-term vision |
 
-**Arbitrum One + Stylus adalah satu-satunya kombinasi yang cocok untuk policy-grade food infrastructure.**
+**Arbitrum One + Stylus is the only combination suitable for policy-grade food infrastructure.**
 
 ---
 
@@ -564,17 +564,17 @@ Python Fallbacks:       0% (no emergency in Q1 2026)
 
 ## Key Takeaways
 
-1. **Dual-layer design** separates concerns: Stylus untuk computation (fast, cheap), Solidity untuk governance (flexible, auditable)
+1. **Dual-layer design** separates concerns: Stylus for computation (fast, cheap), Solidity for governance (flexible, auditable)
 
-2. **Determinism guaranteed** across all layers: sama input = sama output, always
+2. **Determinism guaranteed** across all layers: same input = same output, always
 
 3. **Fallback chain** ensures resilience: Stylus → Solidity → Python
 
-4. **Gas efficiency** membuat pricing accessible: $0.01 per calculation vs $0.25 (Solidity only)
+4. **Gas efficiency** makes pricing accessible: $0.01 per calculation vs $0.25 (Solidity only)
 
-5. **Auditability** fully transparent: semua keputusan can be verified offline
+5. **Auditability** fully transparent: all decisions can be verified offline
 
-6. **Arbitrum alignment** tidak kebetulan: Stylus + Orbit perfect untuk policy-grade infrastructure
+6. **Arbitrum alignment** is not coincidental: Stylus + Orbit perfect for policy-grade infrastructure
 
 ---
 
