@@ -1,0 +1,1 @@
+ruint::bytes::<impl alloy_primitives::Uint<8, 1>>::to_le_bytes::<32>
