@@ -1,13 +1,63 @@
-# 🎨 Frontend Web App - Ethani
+# ETHANI Frontend
 
-Simple, educational Next.js interface for transparent food price stabilization.
+**Demo-Friendly Visualization Layer for Arbitrum-Native Price Calculation**
 
-## Philosophy
+---
 
-✅ **Next.js** - Modern React framework, great for education  
-✅ **Simple UI** - Clean, focus on clarity not complexity  
-✅ **Educational** - Explains pricing rules and why they matter  
-✅ **Transparent** - Show all calculations, no hidden logic  
+## Executive Summary
+
+The ETHANI frontend is a **transparent visualization interface** that:
+
+✅ **Does NOT compute prices** — All logic runs on Arbitrum (Stylus + Solidity)  
+✅ **No authentication required** — Completely open access for demos  
+✅ **No wallet connection needed** — View calculations without blockchain interaction  
+✅ **Deterministic simulation** — Shows results based on Arbitrum contract rules  
+✅ **Educational & transparent** — Explains every pricing decision  
+✅ **Demo-mode interface** — Mock inputs, no real financial data  
+
+**Network Target:** Arbitrum Sepolia (testnet, current) → Arbitrum One (mainnet, Q2 2026)
+
+---
+
+## Overview
+
+### What the Frontend Does
+
+```
+┌─────────────────────────────────────┐
+│  USER INTERFACE (Next.js/React)     │
+│  • Input sliders for supply/demand  │
+│  • Display calculated prices        │
+│  • Show pricing tier & reasoning    │
+│  • Educational explanations         │
+│  • Interactive demos                │
+└──────────────┬──────────────────────┘
+               │ HTTP API calls
+┌──────────────▼──────────────────────┐
+│  BACKEND (FastAPI)                  │
+│  • Input validation                 │
+│  • Fallback chain coordination      │
+│  • Audit logging                    │
+└──────────────┬──────────────────────┘
+               │ ethers.js calls
+┌──────────────▼──────────────────────┐
+│  ARBITRUM SMART CONTRACTS           │
+│  • Stylus (WASM) - Primary          │
+│  • Solidity (EVM) - Fallback        │
+│  • Deterministic pricing rules      │
+└─────────────────────────────────────┘
+```
+
+**Key Point:** Frontend is the **presentation layer** — all business logic runs on Arbitrum.
+
+### What the Frontend Does NOT Do
+
+❌ Compute prices (Arbitrum does)  
+❌ Use AI/ML (rules-based only)  
+❌ Access real market data (simulation mode)  
+❌ Execute blockchain transactions (view-only)  
+❌ Store sensitive data  
+❌ Require authentication  
 
 ---
 
@@ -20,12 +70,26 @@ cd frontend
 npm install
 ```
 
-### 2. Configure API URL
+**Requirements:**
+- Node.js 18+
+- npm 9+
+
+### 2. Configure Backend & Arbitrum
 
 Create `.env.local`:
 
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:8000
+# Backend API (where FastAPI is running)
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+
+# Arbitrum Network Info (for UI display only, no transactions)
+NEXT_PUBLIC_ARBITRUM_NETWORK=sepolia
+NEXT_PUBLIC_ARBITRUM_CHAIN_ID=421614
+NEXT_PUBLIC_ARBITRUM_RPC_URL=https://sepolia-rollup.arbitrum.io/rpc
+
+# Contract Addresses (for UI reference/explorer links)
+NEXT_PUBLIC_STYLUS_CONTRACT=0xf174bC196b4e0886aeA7e48D91661798B376F57C
+NEXT_PUBLIC_SOLIDITY_CONTRACT=0xc92fd01c122821Eb2C911d16468B20b07E25abC0
 ```
 
 ### 3. Start Development Server
@@ -34,14 +98,47 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 npm run dev
 ```
 
-Open: **http://localhost:3000**
+**Frontend available at:** http://localhost:3000  
+**Backend must be running at:** http://localhost:8000
 
-### 4. Build for Production
+### 4. View the App
 
-```bash
-npm run build
-npm start
+Open: http://localhost:3000
+
+- No wallet connection needed
+- No authentication required
+- Interact with price calculator immediately
+
+---
+
+## Key Concept: Demo Mode
+
+ETHANI frontend operates in **demo mode**:
+
 ```
+┌────────────────────────────────────────┐
+│         DEMO MODE BEHAVIOR             │
+├────────────────────────────────────────┤
+│ ✅ User can input any supply value    │
+│ ✅ User can input any demand value    │
+│ ✅ Backend calculates fair price      │
+│ ✅ Price is deterministic (same every │
+│    time for same inputs)              │
+│ ✅ No real market data used           │
+│ ✅ No actual transactions             │
+│ ✅ Purely educational simulation      │
+│                                        │
+│ Production Version (2027+):            │
+│ • Real supply-demand data inputs      │
+│ • Verified oracle feeds               │
+│ • Region-specific pricing             │
+│ • On-chain record of calculations     │
+│ • Arbitrum Orbit regional chains      │
+└────────────────────────────────────────┘
+```
+
+**Message to judges/users:**
+> "ETHANI demonstrates a deterministic pricing simulation based on real-world supply-demand rules. The frontend shows how transparent, rule-based pricing can work. In production, data inputs would be sourced from verified contributors and oracles, while pricing logic remains fully deterministic and on-chain."
 
 ---
 
@@ -50,84 +147,68 @@ npm start
 ```
 frontend/
 ├── app/
-│   ├── layout.tsx          # Root layout (header, footer)
-│   ├── page.tsx            # Home page
-│   ├── globals.css         # Global styles
-│   └── ...                 # Other pages
+│   ├── layout.tsx            # Root layout
+│   ├── page.tsx              # Home page (main demo)
+│   ├── globals.css           # Global styles
+│   └── [...other pages...]
 │
 ├── components/
-│   ├── PriceCard.tsx       # Main price calculator component
-│   ├── RuleExplainer.tsx   # Educational component (to create)
-│   ├── RatioAnalyzer.tsx   # Ratio analysis component (to create)
-│   └── ...                 # Other components
+│   ├── PriceCalculator.tsx   # Main price input/output
+│   ├── RuleExplainer.tsx     # Pricing rules education
+│   ├── TierVisualizer.tsx    # Visual tier indicator
+│   ├── Header.tsx            # Navigation header
+│   └── [...other components]
 │
 ├── lib/
-│   └── api.ts              # Backend API client
+│   ├── api.ts                # Backend API client
+│   ├── types.ts              # TypeScript types
+│   └── utils.ts              # Utility functions
 │
-├── package.json            # Dependencies
-└── public/                 # Static assets (images, icons)
+├── public/                   # Static assets
+│
+├── .env.local                # Configuration
+├── package.json              # Dependencies
+├── tsconfig.json             # TypeScript config
+├── next.config.js            # Next.js config
+└── tailwind.config.ts        # Tailwind config
 ```
 
 ---
 
 ## Core Components
 
-### 1. **PriceCard.tsx** - Main Calculator
+### 1. PriceCalculator.tsx
 
-The primary component for price calculation.
+Main interactive component for price calculation demo.
 
 **Features:**
-- Input sliders for supply, demand, base price
-- Real-time price calculation
-- Shows current tier (shortage, balanced, surplus)
-- Displays multiplier and final price
-- Explains the pricing decision
+- Sliders for supply (0-1000 units)
+- Sliders for demand (0-1000 units)
+- Input for base price
+- Real-time calculation via backend
+- Display of calculated price & reasoning
+- Visual tier indicator (shortage/balanced/surplus)
 
-**Usage:**
-
-```tsx
-import PriceCard from '@/components/PriceCard';
-
-export default function Home() {
-  return <PriceCard />;
-}
-```
-
-**Props:**
-```typescript
-interface PriceCardProps {
-  initialSupply?: number;
-  initialDemand?: number;
-  initialBasePrice?: number;
-  onPriceChange?: (result: PriceResult) => void;
-}
-```
-
-**User Flow:**
-1. User adjusts supply slider (0-1000)
-2. User adjusts demand slider (0-1000)
-3. Component calculates ratio in real-time
-4. Shows pricing tier and adjustment
-5. Displays final price and explanation
-
-**Example Code:**
-
+**No Wallet Connection Required:**
 ```tsx
 'use client';
 
 import { useState } from 'react';
-import { calculatePrice, PriceResult } from '@/lib/api';
+import { calculatePrice } from '@/lib/api';
 
-export default function PriceCard() {
+export default function PriceCalculator() {
   const [supply, setSupply] = useState(100);
   const [demand, setDemand] = useState(150);
   const [basePrice, setBasePrice] = useState(100);
-  const [result, setResult] = useState<PriceResult | null>(null);
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleCalculate = async () => {
     setLoading(true);
     try {
+      // Call backend API
+      // Backend calls Arbitrum contracts
+      // Returns deterministic result
       const response = await calculatePrice({
         supply,
         demand,
@@ -141,13 +222,23 @@ export default function PriceCard() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-bold mb-6">Price Calculator</h2>
+    <div className="card">
+      <h1 className="text-3xl font-bold mb-6">
+        Fair Food Price Calculator
+      </h1>
       
+      {/* Demo Mode Notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-6">
+        <p className="text-sm text-blue-800">
+          <strong>Demo Mode:</strong> This is a deterministic pricing simulation. 
+          Try different supply/demand values to see how the algorithm responds.
+        </p>
+      </div>
+
       {/* Supply Slider */}
-      <div className="mb-4">
+      <div className="mb-6">
         <label className="block text-sm font-medium mb-2">
-          Supply: {supply} units
+          Supply: <strong>{supply} units</strong>
         </label>
         <input
           type="range"
@@ -160,9 +251,9 @@ export default function PriceCard() {
       </div>
 
       {/* Demand Slider */}
-      <div className="mb-4">
+      <div className="mb-6">
         <label className="block text-sm font-medium mb-2">
-          Demand: {demand} units
+          Demand: <strong>{demand} units</strong>
         </label>
         <input
           type="range"
@@ -177,13 +268,14 @@ export default function PriceCard() {
       {/* Base Price Input */}
       <div className="mb-6">
         <label className="block text-sm font-medium mb-2">
-          Base Price: ${basePrice}
+          Base Price: <strong>${basePrice}</strong>
         </label>
         <input
           type="number"
           value={basePrice}
           onChange={(e) => setBasePrice(Number(e.target.value))}
           className="w-full border rounded px-3 py-2"
+          min="1"
         />
       </div>
 
@@ -191,23 +283,48 @@ export default function PriceCard() {
       <button
         onClick={handleCalculate}
         disabled={loading}
-        className="w-full bg-green-600 text-white py-2 rounded font-medium hover:bg-green-700 disabled:opacity-50"
+        className="w-full bg-green-600 text-white py-3 rounded font-medium hover:bg-green-700 disabled:opacity-50"
       >
-        {loading ? 'Calculating...' : 'Calculate Price'}
+        {loading ? 'Calculating on Arbitrum...' : 'Calculate Fair Price'}
       </button>
 
       {/* Results */}
       {result && (
-        <div className="mt-6 p-4 bg-gray-50 rounded">
-          <h3 className="font-bold text-lg">Result</h3>
-          <p className="text-gray-600 text-sm">Ratio: {result.ratio}</p>
-          <p className="text-2xl font-bold text-green-600 my-2">
-            ${result.suggested_price}
-          </p>
-          <p className="text-sm text-gray-700">{result.reason}</p>
-          {result.is_capped && (
-            <p className="text-sm text-red-600 mt-2">⚠️ Price is hard-limited</p>
-          )}
+        <div className="mt-8 p-6 bg-green-50 border border-green-300 rounded">
+          <h2 className="text-2xl font-bold mb-4">Fair Price Result</h2>
+          
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <p className="text-gray-600 text-sm">Supply-Demand Ratio</p>
+              <p className="text-2xl font-bold">{result.ratio.toFixed(2)}</p>
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm">Price Tier</p>
+              <p className="text-2xl font-bold">{result.tier}</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded border mb-6">
+            <p className="text-gray-600 text-sm mb-2">Calculated Price</p>
+            <p className="text-4xl font-bold text-green-600">${result.price}</p>
+            <p className="text-sm text-gray-500 mt-2">
+              {result.multiplier > 1 ? '↑' : result.multiplier < 1 ? '↓' : '→'}
+              {' '}{Math.abs((result.multiplier - 1) * 100).toFixed(0)}% adjustment
+            </p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded">
+            <p className="text-sm text-gray-700">
+              <strong>Why?</strong> {result.reason}
+            </p>
+          </div>
+
+          {/* Contract Info */}
+          <div className="mt-6 text-xs text-gray-500 border-t pt-4">
+            <p>Calculated via: {result.calculation_source === 'stylus' ? '⚡ Stylus (WASM)' : '✅ Solidity (EVM)'}</p>
+            <p>Network: Arbitrum {process.env.NEXT_PUBLIC_ARBITRUM_NETWORK}</p>
+            <p>Timestamp: {new Date(result.timestamp).toLocaleString()}</p>
+          </div>
         </div>
       )}
     </div>
@@ -215,16 +332,18 @@ export default function PriceCard() {
 }
 ```
 
----
+### 2. RuleExplainer.tsx
 
-### 2. **RuleExplainer.tsx** - Educational Component
+Educational component explaining the four pricing tiers.
 
-Explains pricing rules in simple language.
-
-**To Create:**
+**Features:**
+- Visual explanation of each tier
+- Real-world examples
+- Supply-demand ratio thresholds
+- Hard limit explanations
 
 ```tsx
-// components/RuleExplainer.tsx
+'use client';
 
 export default function RuleExplainer() {
   const rules = [
@@ -233,132 +352,164 @@ export default function RuleExplainer() {
       ratio: "> 1.30",
       adjustment: "+15%",
       icon: "🚨",
-      explanation: "Demand is much higher than supply. Increase price to encourage supply and reduce demand.",
-      example: "Supply: 100, Demand: 150 → Price: +15%"
+      explanation: "Demand far exceeds supply. Price increases to encourage production and reduce consumption.",
+      example: "Supply: 100, Demand: 150 → Ratio: 1.5 → +15% increase"
     },
     {
       tier: "Shortage",
       ratio: "> 1.10",
       adjustment: "+8%",
       icon: "⚠️",
-      explanation: "Demand exceeds supply. Slightly increase price to balance the market.",
-      example: "Supply: 100, Demand: 120 → Price: +8%"
+      explanation: "Demand moderately exceeds supply. Slight price increase to balance the market.",
+      example: "Supply: 100, Demand: 120 → Ratio: 1.2 → +8% increase"
     },
     {
       tier: "Balanced",
-      ratio: "0.80-1.10",
+      ratio: "0.80–1.10",
       adjustment: "0%",
       icon: "✅",
-      explanation: "Supply and demand are balanced. Keep price stable.",
-      example: "Supply: 100, Demand: 100 → Price: 0%"
+      explanation: "Supply and demand are roughly equal. Price stays stable.",
+      example: "Supply: 100, Demand: 100 → Ratio: 1.0 → No change"
     },
     {
       tier: "Surplus",
       ratio: "< 0.80",
       adjustment: "-10%",
       icon: "📦",
-      explanation: "Supply exceeds demand. Decrease price to encourage consumption.",
-      example: "Supply: 200, Demand: 100 → Price: -10%"
+      explanation: "Supply exceeds demand. Price decreases to encourage consumption.",
+      example: "Supply: 200, Demand: 100 → Ratio: 0.5 → -10% decrease"
     }
   ];
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold mb-6">📚 How Pricing Works</h2>
-      
-      {rules.map((rule, idx) => (
-        <div key={idx} className="border-l-4 border-green-600 p-4 bg-green-50">
-          <div className="flex items-start">
-            <span className="text-3xl mr-4">{rule.icon}</span>
-            <div className="flex-1">
-              <h3 className="font-bold text-lg">{rule.tier}</h3>
-              <p className="text-sm text-gray-600">Ratio: {rule.ratio}</p>
-              <p className="text-lg font-bold text-green-600 my-2">{rule.adjustment}</p>
-              <p className="text-gray-700 mb-2">{rule.explanation}</p>
-              <p className="text-sm text-gray-500 italic">{rule.example}</p>
+    <div className="space-y-6">
+      <h2 className="text-3xl font-bold">How Deterministic Pricing Works</h2>
+      <p className="text-gray-600">
+        ETHANI uses transparent, rule-based pricing executed on Arbitrum smart contracts. 
+        No AI. No speculation. Just clear, auditable logic.
+      </p>
+
+      {/* Pricing Tiers */}
+      <div className="space-y-4">
+        {rules.map((rule, idx) => (
+          <div key={idx} className="border-l-4 border-green-600 p-4 bg-green-50 rounded">
+            <div className="flex items-start gap-4">
+              <span className="text-4xl">{rule.icon}</span>
+              <div className="flex-1">
+                <h3 className="font-bold text-lg">{rule.tier}</h3>
+                <p className="text-sm text-gray-600 mb-2">Ratio: {rule.ratio}</p>
+                <p className="text-xl font-bold text-green-600 mb-2">{rule.adjustment}</p>
+                <p className="text-gray-700 mb-2">{rule.explanation}</p>
+                <p className="text-sm text-gray-500 italic">📊 {rule.example}</p>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
-      <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded">
-        <h3 className="font-bold mb-2">🛡️ Hard Limits</h3>
-        <p className="text-sm text-gray-700">
-          Even with extreme supply-demand imbalances, prices are protected:
+      {/* Hard Limits */}
+      <div className="bg-yellow-50 border-2 border-yellow-300 rounded p-6">
+        <h3 className="font-bold text-lg mb-3">🛡️ Hard Limits (Safeguards)</h3>
+        <p className="text-gray-700 mb-4">
+          Even in extreme supply-demand situations, prices are capped to protect both 
+          farmers and consumers:
         </p>
-        <ul className="text-sm text-gray-700 mt-2 space-y-1">
-          <li>✅ Maximum price increase: <strong>+50%</strong></li>
-          <li>✅ Maximum price decrease: <strong>-30%</strong></li>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-white p-4 rounded border border-yellow-200">
+            <p className="text-sm text-gray-600">Maximum Increase</p>
+            <p className="text-2xl font-bold text-green-600">+50%</p>
+            <p className="text-xs text-gray-500 mt-1">Protects consumers from excessive prices</p>
+          </div>
+          <div className="bg-white p-4 rounded border border-yellow-200">
+            <p className="text-sm text-gray-600">Maximum Decrease</p>
+            <p className="text-2xl font-bold text-blue-600">-30%</p>
+            <p className="text-xs text-gray-500 mt-1">Protects farmers from losing money</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Transparency Notice */}
+      <div className="bg-purple-50 border-2 border-purple-300 rounded p-6">
+        <h3 className="font-bold text-lg mb-2">🔍 Fully Transparent & Auditable</h3>
+        <ul className="space-y-2 text-gray-700">
+          <li>✅ All pricing logic runs on Arbitrum smart contracts</li>
+          <li>✅ Same calculation in Stylus (WASM) and Solidity (EVM) fallback</li>
+          <li>✅ Every price is auditable and reproducible</li>
+          <li>✅ Deterministic: same inputs always produce same output</li>
+          <li>✅ Open source (MIT licensed)</li>
         </ul>
-        <p className="text-xs text-gray-500 mt-2">
-          This prevents farmers from losing money and protects consumers from excessive prices.
-        </p>
       </div>
     </div>
   );
 }
 ```
 
----
+### 3. TierVisualizer.tsx
 
-### 3. **RatioAnalyzer.tsx** - Educational Component
-
-Shows supply-demand ratio analysis.
-
-**To Create:**
+Visual indicator of current pricing tier based on supply-demand ratio.
 
 ```tsx
-// components/RatioAnalyzer.tsx
+'use client';
 
-export default function RatioAnalyzer() {
-  const [supply, setSupply] = useState(100);
-  const [demand, setDemand] = useState(100);
-  const [ratio, setRatio] = useState(1.0);
+import { useMemo } from 'react';
 
-  useEffect(() => {
-    setRatio(demand / supply);
-  }, [supply, demand]);
+interface TierVisualizerProps {
+  supply: number;
+  demand: number;
+}
 
-  const getTierColor = (r: number) => {
-    if (r > 1.3) return 'bg-red-100 border-red-300 text-red-800';
-    if (r > 1.1) return 'bg-orange-100 border-orange-300 text-orange-800';
-    if (r >= 0.8) return 'bg-green-100 border-green-300 text-green-800';
-    return 'bg-blue-100 border-blue-300 text-blue-800';
+export default function TierVisualizer({ supply, demand }: TierVisualizerProps) {
+  const ratio = useMemo(() => demand / supply, [supply, demand]);
+
+  const getTierInfo = (r: number) => {
+    if (r > 1.3) {
+      return {
+        name: "Critical Shortage",
+        multiplier: 1.15,
+        color: "bg-red-500",
+        icon: "🚨",
+        description: "Demand far exceeds supply"
+      };
+    }
+    if (r > 1.1) {
+      return {
+        name: "Shortage",
+        multiplier: 1.08,
+        color: "bg-orange-500",
+        icon: "⚠️",
+        description: "Demand exceeds supply"
+      };
+    }
+    if (r >= 0.8) {
+      return {
+        name: "Balanced",
+        multiplier: 1.0,
+        color: "bg-green-500",
+        icon: "✅",
+        description: "Supply equals demand"
+      };
+    }
+    return {
+      name: "Surplus",
+      multiplier: 0.9,
+      color: "bg-blue-500",
+      icon: "📦",
+      description: "Supply exceeds demand"
+    };
   };
 
-  return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-6">Supply-Demand Ratio</h2>
-      
-      <div className="flex items-center justify-center space-x-4 mb-8">
-        <div className="text-center">
-          <p className="text-4xl font-bold text-gray-800">{supply}</p>
-          <p className="text-gray-600">Supply</p>
-        </div>
-        
-        <div className="text-4xl text-gray-400">÷</div>
-        
-        <div className="text-center">
-          <p className="text-4xl font-bold text-gray-800">{demand}</p>
-          <p className="text-gray-600">Demand</p>
-        </div>
-        
-        <div className="text-4xl text-gray-400">=</div>
-        
-        <div className="text-center">
-          <p className="text-4xl font-bold text-green-600">{ratio.toFixed(2)}</p>
-          <p className="text-gray-600">Ratio</p>
-        </div>
-      </div>
+  const tier = getTierInfo(ratio);
 
-      <div className={`p-4 rounded border-2 ${getTierColor(ratio)} text-center`}>
-        <p className="font-bold text-lg">
-          {ratio > 1.3 ? '🚨 Critical Shortage' : 
-           ratio > 1.1 ? '⚠️ Shortage' :
-           ratio >= 0.8 ? '✅ Balanced' :
-           '📦 Surplus'}
-        </p>
-      </div>
+  return (
+    <div className={`${tier.color} text-white rounded-lg p-6`}>
+      <p className="text-4xl mb-2">{tier.icon}</p>
+      <h2 className="text-2xl font-bold mb-2">{tier.name}</h2>
+      <p className="text-sm mb-4">{tier.description}</p>
+      <p className="text-3xl font-bold">
+        {tier.multiplier > 1 ? '+' : tier.multiplier < 1 ? '-' : ''}
+        {Math.abs((tier.multiplier - 1) * 100).toFixed(0)}%
+      </p>
+      <p className="text-xs mt-2 opacity-80">Ratio: {ratio.toFixed(2)}</p>
     </div>
   );
 }
@@ -366,166 +517,79 @@ export default function RatioAnalyzer() {
 
 ---
 
-## Pages
+## Backend Integration
 
-### Home Page (`app/page.tsx`)
+### API Client (`lib/api.ts`)
 
-Main landing page with price calculator.
-
-```tsx
-import PriceCard from '@/components/PriceCard';
-import RuleExplainer from '@/components/RuleExplainer';
-
-export default function Home() {
-  return (
-    <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-8 mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">
-          Fair Food Prices for Everyone
-        </h1>
-        <p className="text-xl text-gray-600 mb-4">
-          ETHANI uses transparent, rule-based pricing to stabilize food markets.
-          No AI. No hidden algorithms. Just clear, auditable logic.
-        </p>
-      </section>
-
-      {/* Two Column Layout */}
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Left: Calculator */}
-        <div>
-          <PriceCard />
-        </div>
-
-        {/* Right: Education */}
-        <div>
-          <RuleExplainer />
-        </div>
-      </div>
-    </div>
-  );
-}
-```
-
-### Documentation Page (`app/docs.tsx`)
-
-```tsx
-export default function DocsPage() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">API Documentation</h1>
-      
-      <div className="bg-blue-50 border border-blue-200 rounded p-6 mb-8">
-        <p className="text-gray-700 mb-4">
-          ETHANI provides a simple REST API for price calculations.
-        </p>
-        
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-bold mb-2">Base URL</h3>
-            <code className="bg-white p-2 rounded text-sm">
-              http://localhost:8000
-            </code>
-          </div>
-
-          <div>
-            <h3 className="font-bold mb-2">GET /price</h3>
-            <p className="text-sm text-gray-700 mb-2">Calculate fair price</p>
-            <code className="bg-white p-2 rounded text-xs block overflow-auto">
-              /price?supply=100&demand=150&base_price=100
-            </code>
-          </div>
-
-          <div>
-            <h3 className="font-bold mb-2">GET /ratio</h3>
-            <p className="text-sm text-gray-700 mb-2">Analyze ratio</p>
-            <code className="bg-white p-2 rounded text-xs block overflow-auto">
-              /ratio?supply=100&demand=150
-            </code>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-```
-
----
-
-## Styling
-
-### Tailwind CSS Configuration
-
-Use Tailwind CSS for styling (already included in Next.js):
-
-```css
-/* app/globals.css */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Custom colors for ETHANI */
-:root {
-  --color-primary: #16a34a; /* green-600 */
-  --color-shortage: #ea580c; /* orange-600 */
-  --color-critical: #dc2626; /* red-600 */
-  --color-surplus: #2563eb; /* blue-600 */
-}
-
-/* Reusable component classes */
-@layer components {
-  .btn-primary {
-    @apply bg-green-600 text-white px-4 py-2 rounded font-medium hover:bg-green-700;
-  }
-
-  .card {
-    @apply bg-white rounded-lg shadow p-6;
-  }
-
-  .tier-badge {
-    @apply inline-block px-3 py-1 rounded font-medium text-sm;
-  }
-}
-```
-
----
-
-## API Client (`lib/api.ts`)
-
-TypeScript client for backend communication.
-
-**Main Functions:**
+All API calls are read-only (no transactions):
 
 ```typescript
-// Calculate price
-async function calculatePrice(input: PriceInput): Promise<PriceResult>
+// lib/api.ts
+import { PriceRequest, PriceResult } from './types';
 
-// Get ratio analysis
-async function getSupplyDemandRatio(supply: number, demand: number): Promise<RatioResult>
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
-// Get detailed calculation
-async function getDetailedPrice(input: PriceRequest): Promise<DetailedPriceResult>
+export async function calculatePrice(params: PriceRequest): Promise<PriceResult> {
+  const query = new URLSearchParams({
+    supply: String(params.supply),
+    demand: String(params.demand),
+    base_price: String(params.base_price)
+  });
 
-// Get all rules
-async function getPricingRules(): Promise<RulesResponse>
+  const response = await fetch(
+    `${API_URL}/price?${query}`,
+    { method: 'GET' }
+  );
 
-// Health check
-async function healthCheck(): Promise<HealthResponse>
+  if (!response.ok) {
+    throw new Error(`Backend error: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+export async function getPricingRules() {
+  const response = await fetch(`${API_URL}/rules`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch pricing rules');
+  }
+  return response.json();
+}
+
+export async function getSupplyDemandRatio(supply: number, demand: number) {
+  const response = await fetch(
+    `${API_URL}/ratio?supply=${supply}&demand=${demand}`
+  );
+  if (!response.ok) {
+    throw new Error('Failed to calculate ratio');
+  }
+  return response.json();
+}
 ```
 
-**Error Handling:**
+### Types (`lib/types.ts`)
 
 ```typescript
-try {
-  const result = await calculatePrice(input);
-  setResult(result);
-} catch (error) {
-  if (error instanceof FetchError) {
-    setError(`API Error: ${error.message}`);
-  } else {
-    setError('Failed to calculate price');
-  }
+// lib/types.ts
+export interface PriceRequest {
+  supply: number;
+  demand: number;
+  base_price: number;
+}
+
+export interface PriceResult {
+  price: number;
+  ratio: number;
+  tier: 'critical_shortage' | 'shortage' | 'balanced' | 'surplus';
+  multiplier: number;
+  reason: string;
+  base_price: number;
+  hard_limit_applied: boolean;
+  calculation_source: 'stylus' | 'solidity' | 'local';
+  contract_address?: string;
+  arbitrum_network: 'sepolia' | 'one';
+  timestamp: string;
+  ai_used: false;
 }
 ```
 
@@ -533,68 +597,36 @@ try {
 
 ## Environment Configuration
 
-### `.env.local` (Development)
+### Development (.env.local)
 
 ```bash
-# Backend API
-NEXT_PUBLIC_API_URL=http://localhost:8000
+# Backend API endpoint
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 
-# Optional: Analytics
-NEXT_PUBLIC_GA_ID=
+# Arbitrum Network (for UI reference, no transactions)
+NEXT_PUBLIC_ARBITRUM_NETWORK=sepolia
+NEXT_PUBLIC_ARBITRUM_CHAIN_ID=421614
+NEXT_PUBLIC_ARBITRUM_RPC_URL=https://sepolia-rollup.arbitrum.io/rpc
 
-# Optional: Feature flags
-NEXT_PUBLIC_SHOW_ADVANCED=false
+# Contract Addresses (for explorer links only)
+NEXT_PUBLIC_STYLUS_CONTRACT=0xf174bC196b4e0886aeA7e48D91661798B376F57C
+NEXT_PUBLIC_SOLIDITY_CONTRACT=0xc92fd01c122821Eb2C911d16468B20b07E25abC0
+
+# Feature Flags
+NEXT_PUBLIC_DEMO_MODE=true
+NEXT_PUBLIC_SHOW_CONTRACT_INFO=true
 ```
 
-### `.env.production` (Production)
+### Production (Arbitrum One mainnet)
 
 ```bash
-# Production API
-NEXT_PUBLIC_API_URL=https://api.ethani.example.com
-
-# Analytics
-NEXT_PUBLIC_GA_ID=your-ga-id
-
-# Feature flags
-NEXT_PUBLIC_SHOW_ADVANCED=true
-```
-
----
-
-## Development
-
-### Running Development Server
-
-```bash
-npm run dev
-# Server at http://localhost:3000
-# Hot reload on file changes
-```
-
-### Code Quality
-
-```bash
-# Format code
-npm run format
-
-# Lint
-npm run lint
-
-# Type check
-npm run type-check
-```
-
-### Testing
-
-```bash
-# Run tests
-npm test
-
-# Watch mode
-npm test -- --watch
-
-# Coverage
-npm test -- --coverage
+NEXT_PUBLIC_BACKEND_URL=https://api.ethani.farm
+NEXT_PUBLIC_ARBITRUM_NETWORK=one
+NEXT_PUBLIC_ARBITRUM_CHAIN_ID=42161
+NEXT_PUBLIC_ARBITRUM_RPC_URL=https://arb1.arbitrum.io/rpc
+NEXT_PUBLIC_STYLUS_CONTRACT=0x[mainnet-stylus-address]
+NEXT_PUBLIC_SOLIDITY_CONTRACT=0x[mainnet-solidity-address]
+NEXT_PUBLIC_DEMO_MODE=false
 ```
 
 ---
@@ -607,41 +639,21 @@ npm test -- --coverage
 npm run build
 ```
 
-Optimizes and prepares for deployment.
+Optimizes for production with code splitting and minification.
 
-### Deployment Options
+### Deployment
 
 #### Vercel (Recommended)
 
 ```bash
-# Install Vercel CLI
 npm i -g vercel
-
-# Deploy
 vercel
 ```
 
-**Benefits:**
-- Zero config
+- Zero-config deployment
 - Automatic deployments on git push
-- Built-in analytics
 - Global CDN
 - Free tier available
-
-#### Netlify
-
-```bash
-npm run build
-# Deploy build/ folder to Netlify
-```
-
-#### Self-Hosted
-
-```bash
-npm run build
-npm start
-# Server at http://localhost:3000
-```
 
 #### Docker
 
@@ -656,149 +668,129 @@ COPY . .
 RUN npm run build
 
 EXPOSE 3000
+
+ENV NEXT_PUBLIC_BACKEND_URL=http://backend:8000
+ENV NEXT_PUBLIC_ARBITRUM_NETWORK=sepolia
+
 CMD ["npm", "start"]
 ```
 
+#### Netlify / Railway / AWS Amplify
+
+All support Next.js with simple configuration.
+
+---
+
+## Design Principles
+
+### 1. **No Authentication Required**
+- Anyone can view and use the demo
+- No wallet connection needed
+- No private keys involved
+- No blockchain write transactions
+
+### 2. **Deterministic Display**
+- Same inputs always show same price
+- Timestamp shows when calculation occurred
+- Source (Stylus/Solidity) clearly labeled
+- Arbitrum network clearly displayed
+
+### 3. **Educational Focus**
+- Explain every decision
+- Show the calculation formula
+- Display the tier and its reasoning
+- Link to documentation
+
+### 4. **Transparency**
+- No hidden logic
+- Show backend responses
+- Display contract addresses
+- Clear about demo mode vs production
+
+---
+
+## Testing
+
+### Manual Testing
+
 ```bash
-docker build -t ethani-frontend .
-docker run -p 3000:3000 ethani-frontend
+# Test basic flow
+1. npm run dev
+2. Open http://localhost:3000
+3. Adjust supply slider to 100
+4. Adjust demand slider to 150
+5. Click "Calculate Fair Price"
+6. Verify result shows:
+   - Price: 115
+   - Ratio: 1.5
+   - Tier: Critical Shortage
+   - Reason explaining +15% adjustment
 ```
 
----
+### Test Scenarios
 
-## Educational Features
-
-### 1. **Transparency**
-- Show all calculations
-- Explain every decision
-- Visualize ratio changes
-- Display formulas
-
-### 2. **Interactivity**
-- Real-time sliders
-- Instant calculations
-- Dynamic feedback
-- Visual tier changes
-
-### 3. **Learning**
-- Clear explanations
-- Examples for each tier
-- Educational tooltips
-- Rules documentation
-
-### 4. **Accessibility**
-- Semantic HTML
-- ARIA labels
-- Keyboard navigation
-- High contrast colors
+| Scenario | Supply | Demand | Expected Price | Expected Tier |
+|----------|--------|--------|-----------------|--------------|
+| Critical Shortage | 100 | 150 | 115 | Critical Shortage |
+| Shortage | 100 | 120 | 108 | Shortage |
+| Balanced | 100 | 100 | 100 | Balanced |
+| Surplus | 200 | 100 | 90 | Surplus |
+| Hard Limit (Extreme) | 10 | 200 | 150 | Capped at +50% |
 
 ---
 
-## Component Development Guide
+## Performance Optimization
 
-### Creating a New Component
+### Code Splitting
 
 ```tsx
-// components/MyComponent.tsx
-'use client';
+import dynamic from 'next/dynamic';
 
-import { useState, useEffect } from 'react';
-
-interface MyComponentProps {
-  title: string;
-  data?: any[];
-  onAction?: (data: any) => void;
-}
-
-export default function MyComponent({ 
-  title, 
-  data = [], 
-  onAction 
-}: MyComponentProps) {
-  const [state, setState] = useState(null);
-
-  useEffect(() => {
-    // Effect logic
-  }, []);
-
-  return (
-    <div className="card">
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
-      {/* Component content */}
-    </div>
-  );
-}
+const HeavyComponent = dynamic(
+  () => import('./HeavyComponent'),
+  { loading: () => <p>Loading...</p> }
+);
 ```
 
-### Key Principles
+### Image Optimization
 
-✅ **Client Components** - Use `'use client'` for interactivity  
-✅ **Props Over Globals** - Accept props for configuration  
-✅ **TypeScript** - Define interfaces for props  
-✅ **Error Handling** - Try/catch API calls  
-✅ **Loading States** - Show feedback during operations  
-✅ **Responsive** - Mobile-first design  
+```tsx
+import Image from 'next/image';
 
----
+<Image
+  src="/logo.png"
+  alt="ETHANI"
+  width={200}
+  height={200}
+  priority
+/>
+```
 
-## Performance
+### Caching
 
-### Optimization Techniques
-
-1. **Code Splitting**
-   ```tsx
-   import dynamic from 'next/dynamic';
-   
-   const HeavyComponent = dynamic(
-     () => import('./HeavyComponent'),
-     { loading: () => <p>Loading...</p> }
-   );
-   ```
-
-2. **Image Optimization**
-   ```tsx
-   import Image from 'next/image';
-   
-   <Image
-     src="/ethani-logo.png"
-     alt="ETHANI"
-     width={200}
-     height={200}
-   />
-   ```
-
-3. **Caching**
-   ```tsx
-   export const revalidate = 3600; // 1 hour cache
-   ```
+```tsx
+// Cache API responses for 5 minutes
+export const revalidate = 300;
+```
 
 ---
 
 ## Troubleshooting
 
-### API Connection Issues
+### Backend Connection Error
 
 ```bash
 # Check backend is running
 curl http://localhost:8000/health
 
-# Update API URL in .env.local
-NEXT_PUBLIC_API_URL=http://localhost:8000
+# Verify API URL in .env.local
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 
-# Restart dev server
+# Restart frontend
 npm run dev
 ```
 
-### CORS Errors
-
-Backend needs CORS configured:
-
-```bash
-# In backend .env
-CORS_ORIGINS=http://localhost:3000
-```
-
-### Build Errors
+### Build Fails
 
 ```bash
 # Clear cache and rebuild
@@ -806,93 +798,77 @@ rm -rf .next
 npm run build
 ```
 
+### Slow Calculations
+
+- Check backend is responsive: `curl http://localhost:8000/health`
+- Monitor network tab in browser DevTools
+- Verify Arbitrum RPC is accessible
+
 ---
 
 ## Contributing
 
-### Code Style
+### Code Guidelines
 
-- Use TypeScript everywhere
-- Follow ESLint/Prettier rules
-- Write semantic HTML
-- Use Tailwind classes consistently
-- Add comments for complex logic
+- TypeScript everywhere
+- Semantic HTML
+- Tailwind CSS for styling
+- Components in `components/` folder
+- No external pricing logic
+- Clear prop documentation
 
 ### Component Checklist
 
 - [ ] Uses TypeScript interfaces
-- [ ] Has PropTypes or TypeScript types
+- [ ] Has PropTypes or types
 - [ ] Handles loading states
 - [ ] Has error handling
-- [ ] Works on mobile
+- [ ] Responsive design (mobile-first)
 - [ ] Accessible (ARIA labels)
-- [ ] Documented with JSDoc
+- [ ] No wallet requirements
+- [ ] Clear demo mode labels
 
-### No AI/ML Rule
+### What NOT to Do
 
-- ❌ Don't use ML for predictions
-- ❌ Don't call AI APIs
-- ❌ Don't use randomness
-- ✅ Use backend-calculated values
-- ✅ Display calculations clearly
-- ✅ Explain every decision
+❌ Don't add authentication to demo  
+❌ Don't use real market data feeds  
+❌ Don't implement pricing logic  
+❌ Don't add AI/ML models  
+❌ Don't require wallet connection  
+✅ Keep it simple and educational  
+✅ Show clear calculation flow  
+✅ Label everything as demo  
 
 ---
 
-## Learning Resources
+## Documentation
 
-### For New Developers
-
-1. **Next.js Basics**
-   - App Router: https://nextjs.org/docs/app
-   - Components: https://nextjs.org/docs/app/building-your-application/rendering
-
-2. **React Patterns**
-   - Hooks: https://react.dev/reference/react
-   - State Management: useState, useContext
-
-3. **Tailwind CSS**
-   - Utilities: https://tailwindcss.com/docs
-   - Responsive Design: https://tailwindcss.com/docs/responsive-design
-
-4. **TypeScript**
-   - Interfaces: https://www.typescriptlang.org/docs/handbook/2/objects.html
-
-### File Structure Tips
-
-- Keep components small and reusable
-- One component per file
-- Group related components in folders
-- Separate logic into hooks
-- Use lib/ for utilities and API
+**For more information:**
+- **Backend:** See [BACKEND_SERVICE.md](./BACKEND_SERVICE.md)
+- **Architecture:** See [architecture.md](./architecture.md)
+- **Pricing Rules:** See [pricing-model.md](./pricing-model.md)
+- **Stylus Details:** See [STYLUS_VERIFICATION_GUIDE.md](./STYLUS_VERIFICATION_GUIDE.md)
+- **Arbitrum Docs:** https://docs.arbitrum.io
 
 ---
 
 ## Deployment Checklist
 
-- [ ] Environment variables set
-- [ ] API URL configured
+- [ ] Environment variables configured
+- [ ] Backend URL set correctly
 - [ ] Build succeeds: `npm run build`
 - [ ] No console errors
-- [ ] Mobile responsive
-- [ ] Backend running
-- [ ] CORS configured
-- [ ] Analytics enabled (optional)
-- [ ] SEO meta tags updated
-- [ ] SSL certificate (HTTPS)
+- [ ] Mobile responsive (test on mobile)
+- [ ] Backend running and accessible
+- [ ] Demo mode clearly labeled (if applicable)
+- [ ] Contract info displayed (Arbitrum network, addresses)
+- [ ] No authentication required
+- [ ] No wallet connection needed
+- [ ] HTTPS configured (production)
 
 ---
 
-## Support
-
-- **Docs:** [docs/FRONTEND.md](./FRONTEND.md)
-- **Issues:** GitHub Issues
-- **Discussions:** GitHub Discussions
-- **Design System:** See `components/` folder
-
----
-
-**Status:** Production-ready  
-**Framework:** Next.js 14  
+**Status:** Production-ready on Arbitrum Sepolia  
+**Framework:** Next.js 14 + React 18  
 **License:** MIT  
-**Philosophy:** Clarity over complexity
+**Philosophy:** Clarity, transparency, education
