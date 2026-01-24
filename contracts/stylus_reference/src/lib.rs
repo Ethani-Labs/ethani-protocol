@@ -35,15 +35,41 @@ impl PriceTier {
     }
 }
 
+/// Event: Emitted when price is calculated
+#[derive(Clone, Copy)]
+#[sol_interface]
+pub interface PriceCalculatedEvent {
+    event PriceCalculated(
+        uint256 indexed region,
+        uint256 supply,
+        uint256 demand,
+        uint256 newPrice,
+        string tier,
+        uint32 multiplier
+    );
+}
+
 /// Main contract state
 #[storage]
 pub struct EthaniPricing {
     pub owner: Address,
     pub paused: bool,
     
-    // NEW: Store last update time per region
+    // Timing & history
     pub last_price_update: u64,
     pub last_known_price: U256,
+    
+    // Regional pricing config (region_id => multiplier_bp)
+    // 0 = default, 1-255 = regional overrides
+    pub regional_multipliers: Mapping<u8, u32>,
+    pub next_region_id: u8,
+}
+
+/// Region configuration data
+pub struct RegionConfig {
+    pub region_id: u8,
+    pub multiplier_bp: u32,
+    pub description: String,
 }
 
 /// Contract implementation
@@ -56,6 +82,8 @@ impl EthaniPricing {
             paused: false,
             last_price_update: 0,
             last_known_price: U256::ZERO,
+            regional_multipliers: Mapping::new(),
+            next_region_id: 1,
         }
     }
 
@@ -222,6 +250,102 @@ impl EthaniPricing {
     pub fn getLastPriceUpdate(&self) -> u64 {
         self.last_price_update
     }
+
+    // ========== PRIORITY 2: BATCH OPERATIONS ==========
+
+    /// Calculate multiple prices in one transaction (up to 10)
+    /// Returns array of (price, tier_str, multiplier)
+    pub fn calculatePriceBatch(
+        &mut self,
+        supplies: Vec<U256>,
+        demands: Vec<U256>,
+        basePrices: Vec<U256>,
+    ) -> Vec<(U256, String)> {
+        require!(!self.paused, "Contract is paused");
+        require!(supplies.len() <= 10, "Max 10 prices per batch");
+        require!(
+            supplies.len() == demands.len() && supplies.len() == basePrices.len(),
+            "Array length mismatch"
+        );
+
+        let mut results: Vec<(U256, String)> = Vec::new();
+
+        for i in 0..supplies.len() {
+            let supply = supplies[i];
+            let demand = demands[i];
+            let base_price = basePrices[i];
+
+            if supply == U256::ZERO || base_price == U256::ZERO {
+                results.push((base_price, "INVALID_INPUT".to_string()));
+                continue;
+            }
+
+            let ratio = (demand * U256::from(100)) / supply;
+            let (tier, multiplier_bp) = self.determine_tier(ratio);
+            let calculated_price = (base_price * U256::from(multiplier_bp)) / U256::from(10000);
+            let capped_price = self.apply_safety_limits(base_price, calculated_price);
+            let final_price = self.apply_volatility_dampening(capped_price, self.last_known_price);
+
+            let tier_str = format!("{}-{}", tier.as_string(), multiplier_bp);
+            results.push((final_price, tier_str));
+        }
+
+        results
+    }
+
+    // ========== PRIORITY 2: REGIONAL CONFIGURATION ==========
+
+    /// Set regional pricing multiplier override
+    /// Owner only - allows regional customization of pricing
+    pub fn setRegionalMultiplier(&mut self, region_id: u8, multiplier_bp: u32) {
+        require!(msg::sender() == self.owner, "Only owner");
+        require!(region_id > 0, "Region 0 is default");
+        require!(multiplier_bp > 0 && multiplier_bp <= 20000, "Multiplier out of range");
+
+        self.regional_multipliers.insert(region_id, multiplier_bp);
+    }
+
+    /// Get regional multiplier (returns 0 if not set = use default)
+    pub fn getRegionalMultiplier(&self, region_id: u8) -> u32 {
+        self.regional_multipliers.get(region_id).unwrap_or_default()
+    }
+
+    /// Calculate price with regional override
+    /// If region_id exists in regional_multipliers, use that instead of tier multiplier
+    pub fn calculatePriceRegional(
+        &mut self,
+        region_id: u8,
+        supply: U256,
+        demand: U256,
+        basePrice: U256,
+    ) -> (U256, String, String) {
+        require!(!self.paused, "Contract is paused");
+        require!(supply > U256::ZERO, "Supply must be > 0");
+
+        let ratio = (demand * U256::from(100)) / supply;
+        let (tier, mut multiplier_bp) = self.determine_tier(ratio);
+
+        // Override with regional multiplier if set
+        if let Some(regional_multiplier) = self.regional_multipliers.get(region_id) {
+            if regional_multiplier > 0 {
+                multiplier_bp = regional_multiplier;
+            }
+        }
+
+        let calculated_price = (basePrice * U256::from(multiplier_bp)) / U256::from(10000);
+        let capped_price = self.apply_safety_limits(basePrice, calculated_price);
+        let final_price = self.apply_volatility_dampening(capped_price, self.last_known_price);
+
+        self.last_known_price = final_price;
+
+        let tier_str = tier.as_string();
+        let reason = format!(
+            "{} - Region: {} - Ratio: {}% - Multiplier: {}bp",
+            tier_str, region_id, ratio / U256::from(1), multiplier_bp
+        );
+
+        (final_price, reason, tier_str.to_string())
+    }
 }
 
 #[cfg(test)]
@@ -353,4 +477,117 @@ mod tests {
         assert!(price2 <= U256::from(1200));
         assert!(price2 >= U256::from(800));
     }
-}
+
+    // ========== PRIORITY 2 TESTS ==========
+
+    #[test]
+    fn test_batch_price_calculation() {
+        let mut contract = EthaniPricing::new();
+        
+        // 3 prices in one batch
+        let supplies = vec![U256::from(100), U256::from(100), U256::from(200)];
+        let demands = vec![U256::from(150), U256::from(95), U256::from(100)];
+        let base_prices = vec![U256::from(1000), U256::from(1000), U256::from(1000)];
+        
+        let results = contract.calculatePriceBatch(supplies, demands, base_prices);
+        
+        assert_eq!(results.len(), 3);
+        // First: Critical shortage → +15%
+        assert!(results[0].0 >= U256::from(1150));
+        // Second: Balanced → no change
+        assert_eq!(results[1].0, U256::from(1000));
+        // Third: Surplus → -10%
+        assert_eq!(results[2].0, U256::from(900));
+    }
+
+    #[test]
+    fn test_batch_max_10_prices() {
+        let mut contract = EthaniPricing::new();
+        
+        // Test max batch size (should work with 10)
+        let mut supplies = Vec::new();
+        let mut demands = Vec::new();
+        let mut bases = Vec::new();
+        for _ in 0..10 {
+            supplies.push(U256::from(100));
+            demands.push(U256::from(100));
+            bases.push(U256::from(1000));
+        }
+        
+        let results = contract.calculatePriceBatch(supplies, demands, bases);
+        assert_eq!(results.len(), 10);
+    }
+
+    #[test]
+    fn test_regional_multiplier_override() {
+        let mut contract = EthaniPricing::new();
+        
+        // Set regional multiplier for region 1
+        contract.setRegionalMultiplier(1, 12000); // +20% override
+        
+        // Calculate with regional override
+        // Ratio 100% would normally be 0%, but override makes it +20%
+        let (price, _, _) = contract.calculatePriceRegional(
+            1, // region_id
+            U256::from(100),
+            U256::from(100),
+            U256::from(1000),
+        );
+        
+        // Should use regional multiplier: 1000 * 12000 / 10000 = 1200
+        assert_eq!(price, U256::from(1200));
+    }
+
+    #[test]
+    fn test_regional_get_multiplier() {
+        let mut contract = EthaniPricing::new();
+        
+        // Default: should be 0 (no override)
+        assert_eq!(contract.getRegionalMultiplier(1), 0);
+        
+        // Set and verify
+        contract.setRegionalMultiplier(1, 11000);
+        assert_eq!(contract.getRegionalMultiplier(1), 11000);
+        
+        // Different region
+        assert_eq!(contract.getRegionalMultiplier(2), 0);
+    }
+
+    #[test]
+    fn test_regional_default_behavior() {
+        let mut contract = EthaniPricing::new();
+        
+        // Without regional override, should use tier multiplier
+        let (price1, _, _) = contract.calculatePrice(
+            U256::from(100),
+            U256::from(150),
+            U256::from(1000),
+        );
+        
+        // With region but no override set
+        let (price2, _, _) = contract.calculatePriceRegional(
+            1,
+            U256::from(100),
+            U256::from(150),
+            U256::from(1000),
+        );
+        
+        // Both should produce same result
+        assert_eq!(price1, price2);
+    }
+
+    #[test]
+    fn test_batch_with_invalid_inputs() {
+        let mut contract = EthaniPricing::new();
+        
+        let supplies = vec![U256::from(0), U256::from(100)]; // First is invalid
+        let demands = vec![U256::from(100), U256::from(100)];
+        let bases = vec![U256::from(1000), U256::from(1000)];
+        
+        let results = contract.calculatePriceBatch(supplies, demands, bases);
+        
+        // Should handle gracefully
+        assert_eq!(results.len(), 2);
+        // Invalid entry should return base price and error reason
+        assert_eq!(results[0].1, "INVALID_INPUT");
+    }
