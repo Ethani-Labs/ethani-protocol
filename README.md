@@ -116,6 +116,29 @@ ETHANI is built on Arbitrum to ensure low-cost execution, fast computation, and 
 
 ---
 
+## 🎯 About This Demo
+
+**ETHANI demonstrates a deterministic pricing simulation** based on real-world supply–demand rules.
+
+The current deployment shows:
+- ✅ **Fully functional rule-based pricing engine** — Deterministic calculations on-chain
+- ✅ **Hybrid smart contract architecture** — Stylus + Solidity + fallback
+- ✅ **Complete infrastructure** — Frontend, backend API, contracts all operational
+
+**In production:**
+- Data inputs would be sourced from verified contributors and oracles (e.g., farmer co-ops, market data providers, agricultural agencies)
+- Pricing logic remains **fully deterministic and on-chain** — no AI, no randomness
+- The oracle component would be governance-controlled and audited
+- All calculations stay transparent and immutable on blockchain
+
+**Why this matters:**
+- Demonstrates the technical foundation is sound and scalable
+- Shows how deterministic, rule-based logic can serve food systems
+- Proves the architecture can handle real-world complexity
+- Avoids claims about real-time market feeds (that's a governance & oracle layer decision)
+
+---
+
 ## 📂 Repository Structure
 
 - **`contracts/`** — Smart contracts (Solidity + Stylus-ready, deployed on Arbitrum Sepolia)
