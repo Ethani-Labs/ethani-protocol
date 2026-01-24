@@ -180,13 +180,13 @@ For detailed implementation guides and architecture diagrams, see [`docs/`](./do
 - [architecture.md](./docs/architecture.md) — Full system design & component breakdown
 - [BACKEND_SERVICE.md](./docs/BACKEND_SERVICE.md) — FastAPI backend guide
 - [FRONTEND.md](./docs/FRONTEND.md) — Next.js frontend guide  
-- [SMART_CONTRACTS_COMPLETE.md](./docs/SMART_CONTRACTS_COMPLETE.md) — Contract reference
+- [SMART_CONTRACTS.md](./docs/SMART_CONTRACTS.md) — Contract reference
 
 **Design & Strategy**
 - [vision.md](./docs/vision.md) — Project mission & values
 - [pricing-model.md](./docs/pricing-model.md) — Pricing rules & formulas
 - [roadmap.md](./docs/roadmap.md) — Development roadmap
-- [HYBRID_ARCHITECTURE_SUMMARY.md](./docs/HYBRID_ARCHITECTURE_SUMMARY.md) — Stylus + Solidity design
+- [HYBRID_ARCHITECTURE.md](./docs/HYBRID_ARCHITECTURE.md) — Stylus + Solidity design
 
 **Deployment & Verification**
 - [COMPATIBILITY_VERIFICATION_JAN24.md](./docs/COMPATIBILITY_VERIFICATION_JAN24.md) — Full compatibility audit
