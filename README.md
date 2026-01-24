@@ -189,8 +189,8 @@ For detailed implementation guides and architecture diagrams, see [`docs/`](./do
 - [HYBRID_ARCHITECTURE.md](./docs/HYBRID_ARCHITECTURE.md) — Stylus + Solidity design
 
 **Deployment & Verification**
-- [COMPATIBILITY_VERIFICATION_JAN24.md](./docs/COMPATIBILITY_VERIFICATION_JAN24.md) — Full compatibility audit
-- [AUDIT_RESULTS_JAN24.txt](./docs/AUDIT_RESULTS_JAN24.txt) — Audit summary (production-ready ✅)
+- [DEPLOYMENT_STATUS.md](./docs/DEPLOYMENT_STATUS.md) — Contract addresses, network status, Stylus verification
+- [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) — Full audit results, test coverage, security assessment (production-ready ✅)
 
 ## 🚀 Quick Start
 
