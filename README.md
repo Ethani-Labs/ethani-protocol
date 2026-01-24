@@ -307,10 +307,10 @@ These caps prevent extreme price swings and protect both producers and consumers
 
 **Audit Result**: ✅ **PRODUCTION READY**  
 **System Status**: ✅ **FULLY OPERATIONAL**  
-**Last Verified**: January 24, 2026  
+**Last Verified**: January 25, 2026  
 **Deployment Date**: January 23-24, 2026
 
-See [AUDIT_RESULTS_JAN24.txt](./docs/AUDIT_RESULTS_JAN24.txt) and [STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md) for complete verification details.
+For complete details, see [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) (46 tests, 0 vulnerabilities) and [STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md) (Stylus verification steps).
 
 ---
 
@@ -469,7 +469,7 @@ See [AUDIT_RESULTS_JAN24.txt](./docs/AUDIT_RESULTS_JAN24.txt) and [STYLUS_VERIFI
 | **Live Contracts** | [Arbitrum Sepolia Explorer](https://sepolia.arbiscan.io) |
 | **Full Architecture** | [architecture.md](./docs/architecture.md) |
 | **Vision & Values** | [vision.md](./docs/vision.md) |
-| **Deployment Details** | [AUDIT_RESULTS_JAN24.txt](./docs/AUDIT_RESULTS_JAN24.txt) |
+| **Audit & Verification** | [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) |
 | **Development Roadmap** | [roadmap.md](./docs/roadmap.md) |
 
 ---
