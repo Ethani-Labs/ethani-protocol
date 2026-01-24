@@ -412,9 +412,9 @@ For complete details, see [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) (46 tests, 0
 
 ### Documentation
 
-- **[STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md)** — Complete Stylus verification guide, testing, and integration
-- **[HYBRID_ARCHITECTURE_SUMMARY.md](./docs/HYBRID_ARCHITECTURE_SUMMARY.md)** — Detailed architecture explanation
-- **[COMPATIBILITY_VERIFICATION_JAN24.md](./docs/COMPATIBILITY_VERIFICATION_JAN24.md)** — Full compatibility audit
+- **[STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md)** — Stylus contract verification, testing, deployment
+- **[HYBRID_ARCHITECTURE.md](./docs/HYBRID_ARCHITECTURE.md)** — Stylus + Solidity dual-layer design
+- **[INTEGRATION_TESTING.md](./docs/INTEGRATION_TESTING.md)** — Complete integration test results (46 tests, all pass)
 
 ---
 
