@@ -433,7 +433,7 @@ For complete details, see [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) (46 tests, 0
    - All contracts operational on Arbitrum Sepolia since Jan 23-24, 2026
    - Full API operational at backend endpoints
    - Frontend web interface deployed and connected
-   - See [DEPLOYMENT_SUCCESS.md](./docs/DEPLOYMENT_SUCCESS.md)
+   - See [DEPLOYMENT_RECORD.md](./docs/DEPLOYMENT_RECORD.md) — Contract addresses and on-chain verification
 
 3. **Hybrid Architecture (10x Performance)** ✅  
    - Stylus (WASM): 0xf174bC196b4e0886aeA7e48D91661798B376F57C — Primary (⚡ 10x faster)
