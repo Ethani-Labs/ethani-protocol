@@ -60,9 +60,19 @@ class BlockchainMode(Enum):
     REAL = "real"          # Real contract calls (requires deployed contracts)
 
 
+class ContractType(Enum):
+    """Contract implementation type"""
+    SOLIDITY = "solidity"  # Traditional EVM Solidity contracts
+    STYLUS = "stylus"      # High-performance WASM contracts (Rust)
+
+
 class ContractIntegration:
     """
-    Integrates backend with smart contracts on Mantle Testnet.
+    Integrates backend with smart contracts on Arbitrum (hybrid: Solidity + Stylus).
+    
+    Supports both:
+    - Solidity contracts (EthaniCore, EthaniRegion, EthaniIncentive)
+    - Stylus contracts (EthaniPricing, PriceOracle) - faster WASM execution
     
     Supports fallback to local pricing if contracts unavailable.
     Per spec: "Backend must fetch from contracts, not calculate locally"
@@ -76,20 +86,54 @@ class ContractIntegration:
             mode: BlockchainMode.MOCK (development) or BlockchainMode.REAL (production)
         """
         self.mode = mode
-        self.pricing_contract_address = os.getenv("ETHANI_PRICING_ADDRESS", "")
-        self.region_contract_address = os.getenv("ETHANI_REGION_ADDRESS", "")
-        self.rpc_url = os.getenv("BLOCKCHAIN_RPC_URL", "https://rpc.testnet.mantle.xyz")
+        
+        # Arbitrum Sepolia contract addresses (deployed Jan 23, 2026)
+        # SOLIDITY CONTRACTS
+        self.pricing_contract_address = os.getenv(
+            "ETHANI_PRICING_ADDRESS",
+            "0xc92fd01c122821Eb2C911d16468B20b07E25abC0"
+        )
+        self.region_contract_address = os.getenv(
+            "ETHANI_REGION_ADDRESS",
+            "0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143"
+        )
+        
+        # STYLUS CONTRACTS (Rust/WASM - High performance)
+        self.pricing_stylus_address = os.getenv(
+            "ETHANI_PRICING_STYLUS_ADDRESS",
+            ""  # Will be set after Stylus deployment
+        )
+        self.regions_stylus_address = os.getenv(
+            "ETHANI_REGIONS_STYLUS_ADDRESS",
+            ""  # Will be set after Stylus deployment
+        )
+        
+        # Arbitrum Sepolia RPC
+        self.rpc_url = os.getenv(
+            "BLOCKCHAIN_RPC_URL",
+            "https://sepolia-rollup.arbitrum.io/rpc"
+        )
+        
+        # Detect contract types and prefer Stylus when available
+        self.use_stylus_pricing = bool(self.pricing_stylus_address)
+        self.use_stylus_regions = bool(self.regions_stylus_address)
         
         # Detect if contracts are deployed
         self.contracts_available = bool(
-            self.pricing_contract_address and 
-            self.region_contract_address
+            (self.pricing_contract_address or self.pricing_stylus_address) and 
+            (self.region_contract_address or self.regions_stylus_address)
         )
         
         # If real mode requested but contracts not deployed, fallback to mock
         if mode == BlockchainMode.REAL and not self.contracts_available:
             print("⚠️  Real mode requested but contracts not deployed. Using MOCK mode.")
             self.mode = BlockchainMode.MOCK
+        
+        # Log contract configuration
+        if self.mode == BlockchainMode.REAL:
+            print(f"✅ Hybrid Contract Mode Enabled")
+            print(f"  Pricing: {'Stylus' if self.use_stylus_pricing else 'Solidity'}")
+            print(f"  Regions: {'Stylus' if self.use_stylus_regions else 'Solidity'}")
     
     def calculate_price(
         self,
@@ -99,7 +143,12 @@ class ContractIntegration:
         region: str = "Default"
     ) -> Dict:
         """
-        Calculate price via smart contract or mock.
+        Calculate price via smart contract (Solidity or Stylus).
+        
+        Hybrid approach:
+        - Uses Stylus (WASM) when available (10x faster, cheaper gas)
+        - Falls back to Solidity when Stylus not deployed
+        - Falls back to local calculation if both unavailable
         
         Per Spec Section III:
         Backend must "Call pricing contracts" and return result.
@@ -116,7 +165,11 @@ class ContractIntegration:
         
         if self.mode == BlockchainMode.REAL and self.contracts_available:
             try:
-                return self._call_pricing_contract(supply, demand, base_price, region)
+                # Try Stylus first (faster), fallback to Solidity
+                if self.use_stylus_pricing:
+                    return self._call_stylus_pricing_contract(supply, demand, base_price, region)
+                else:
+                    return self._call_pricing_contract(supply, demand, base_price, region)
             except Exception as e:
                 print(f"❌ Contract call failed: {e}")
                 return self._fallback_to_base_price(base_price, "CONTRACT_UNAVAILABLE")
@@ -132,15 +185,134 @@ class ContractIntegration:
         region: str
     ) -> Dict:
         """
-        Call EthaniPricing contract on Mantle Testnet.
+        Call EthaniPricing contract (Solidity) on Arbitrum Sepolia.
         
-        This is implemented when contracts are deployed.
-        For now, raises NotImplementedError with clear message.
+        Uses web3.py to call the deployed contract:
+        Address: 0xc92fd01c122821Eb2C911d16468B20b07E25abC0
+        
+        Returns result exactly as contract provides it.
         """
-        raise NotImplementedError(
-            "Contract calls require deployed contracts. "
-            "Use MOCK mode or deploy contracts first."
-        )
+        try:
+            from web3 import Web3
+            
+            # Initialize web3 connection to Arbitrum Sepolia
+            w3 = Web3(Web3.HTTPProvider(self.rpc_url))
+            
+            # Check connection
+            if not w3.is_connected():
+                return self._fallback_to_base_price(base_price, "BLOCKCHAIN_UNAVAILABLE")
+            
+            # Contract ABI (minimal - just calculatePrice)
+            abi = [
+                {
+                    "inputs": [
+                        {"internalType": "uint256", "name": "supply", "type": "uint256"},
+                        {"internalType": "uint256", "name": "demand", "type": "uint256"},
+                        {"internalType": "uint256", "name": "basePrice", "type": "uint256"}
+                    ],
+                    "name": "calculatePrice",
+                    "outputs": [
+                        {"internalType": "uint256", "name": "finalPrice", "type": "uint256"},
+                        {"internalType": "string", "name": "reason", "type": "string"},
+                        {"internalType": "string", "name": "tier", "type": "string"}
+                    ],
+                    "stateMutability": "pure",
+                    "type": "function"
+                }
+            ]
+            
+            # Connect to contract on Arbitrum Sepolia
+            contract = w3.eth.contract(address=w3.to_checksum_address(self.pricing_contract_address), abi=abi)
+            
+            # Call calculatePrice function (pure function, no gas cost)
+            result = contract.functions.calculatePrice(supply, demand, base_price).call()
+            
+            # Unpack result: (finalPrice, reason, tier)
+            final_price, reason_str, tier = result
+            
+            return {
+                "final_price": final_price,
+                "reason": f"{reason_str} [{tier}]",
+                "source": "smart_contract_solidity",
+                "contract_address": self.pricing_contract_address,
+                "contract_type": "solidity",
+                "ai_used": False
+            }
+            
+        except Exception as e:
+            print(f"❌ Solidity contract call failed: {e}")
+            return self._fallback_to_base_price(base_price, "CONTRACT_CALL_FAILED")
+    
+    def _call_stylus_pricing_contract(
+        self,
+        supply: int,
+        demand: int,
+        base_price: int,
+        region: str
+    ) -> Dict:
+        """
+        Call EthaniPricing contract (Stylus/WASM) on Arbitrum.
+        
+        Uses web3.py to call the high-performance Rust contract compiled to WASM.
+        Same logic as Solidity but ~10x faster execution with lower gas costs.
+        
+        Returns result exactly as contract provides it.
+        """
+        try:
+            from web3 import Web3
+            
+            # Initialize web3 connection
+            w3 = Web3(Web3.HTTPProvider(self.rpc_url))
+            
+            # Check connection
+            if not w3.is_connected():
+                return self._fallback_to_base_price(base_price, "BLOCKCHAIN_UNAVAILABLE")
+            
+            # Stylus contract ABI (same interface as Solidity version)
+            abi = [
+                {
+                    "inputs": [
+                        {"internalType": "uint256", "name": "supply", "type": "uint256"},
+                        {"internalType": "uint256", "name": "demand", "type": "uint256"},
+                        {"internalType": "uint256", "name": "basePrice", "type": "uint256"}
+                    ],
+                    "name": "calculatePrice",
+                    "outputs": [
+                        {"internalType": "uint256", "name": "finalPrice", "type": "uint256"},
+                        {"internalType": "string", "name": "reason", "type": "string"},
+                        {"internalType": "string", "name": "tier", "type": "string"}
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ]
+            
+            # Connect to Stylus contract (WASM)
+            contract = w3.eth.contract(address=w3.to_checksum_address(self.pricing_stylus_address), abi=abi)
+            
+            # Call calculatePrice function (WASM execution - much faster!)
+            result = contract.functions.calculatePrice(supply, demand, base_price).call()
+            
+            # Unpack result: (finalPrice, reason, tier)
+            final_price, reason_str, tier = result
+            
+            return {
+                "final_price": final_price,
+                "reason": f"{reason_str} [{tier}]",
+                "source": "smart_contract_stylus",
+                "contract_address": self.pricing_stylus_address,
+                "contract_type": "stylus_wasm",
+                "ai_used": False,
+                "execution_type": "WASM"
+            }
+            
+        except Exception as e:
+            print(f"❌ Stylus contract call failed: {e}")
+            # Fallback to Solidity version
+            if self.pricing_contract_address:
+                return self._call_pricing_contract(supply, demand, base_price, region)
+            else:
+                return self._fallback_to_base_price(base_price, "STYLUS_CALL_FAILED")
     
     def _mock_pricing_calculation(
         self,
@@ -285,8 +457,8 @@ class ContractIntegration:
         }
 
 
-# Global contract instance (use MOCK mode by default)
-blockchain = ContractIntegration(mode=BlockchainMode.MOCK)
+# Global contract instance (use REAL mode - contracts deployed on Arbitrum Sepolia)
+blockchain = ContractIntegration(mode=BlockchainMode.REAL)
 
 
 def update_blockchain_mode(mode: BlockchainMode):

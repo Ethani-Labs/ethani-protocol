@@ -9,7 +9,31 @@ Blockchain integration:
 - Calls EthaniRegion contract for base prices
 - Falls back to base price if contracts unavailable (per spec)
 
-Endpoints:
+API v1 Endpoints (/api/v1/):
+  POST /auth/login      - Login with email/password
+  POST /auth/register   - Register new user
+  GET  /auth/me         - Get current user
+  POST /auth/logout     - Logout
+  POST /auth/select-roles - Update user roles
+  GET  /products        - List products
+  GET  /products/{id}/price - Get product price
+  GET  /market/listings - List market listings
+  POST /market/listings - Create market listing
+  GET  /orders          - List orders
+  POST /orders          - Create order
+  GET  /orders/{id}     - Get order details
+  POST /orders/{id}/confirm - Confirm order
+  POST /orders/{id}/fulfill - Fulfill order
+  POST /orders/{id}/cancel - Cancel order
+  POST /supply          - Record supply
+  GET  /supply/me       - Get my supply
+  POST /waste/record    - Record waste
+  GET  /waste/records   - Get waste records
+  GET  /waste/stats     - Get waste stats
+  GET  /profile         - Get profile
+  PUT  /profile         - Update profile
+
+Legacy Endpoints:
   GET /health           - Service health check
   GET /price            - Calculate fair price (via contract)
   GET /ratio            - Analyze supply-demand ratio
@@ -33,6 +57,7 @@ from .models import (
     DetailedPriceResponse
 )
 from .config import config
+from .api.v1 import api_router
 
 app = FastAPI(
     title=config.API_TITLE,
@@ -50,6 +75,9 @@ app.add_middleware(
     allow_headers=config.CORS_ALLOW_HEADERS,
 )
 
+# Include API v1 router
+app.include_router(api_router)
+
 # ========== ROOT ENDPOINT ==========
 
 @app.get("/")
@@ -57,9 +85,24 @@ def root():
     """API root - redirects to docs"""
     return {
         "message": "ETHANI Pricing API",
+        "version": "1.0.0",
         "docs": "/docs",
-        "health": "/health",
-        "rules": "/rules"
+        "api_v1": "/api/v1",
+        "endpoints": {
+            "auth": "/api/v1/auth",
+            "products": "/api/v1/products",
+            "market": "/api/v1/market",
+            "orders": "/api/v1/orders",
+            "supply": "/api/v1/supply",
+            "waste": "/api/v1/waste",
+            "profile": "/api/v1/profile"
+        },
+        "legacy": {
+            "health": "/health",
+            "price": "/price",
+            "rules": "/rules",
+            "blockchain": "/blockchain"
+        }
     }
 
 # ========== HEALTH CHECK ==========
@@ -294,6 +337,7 @@ async def startup_event():
     print(f"🚀 ETHANI API starting...")
     print(f"📊 Pricing Engine: Rule-based (No AI)")
     print(f"🌍 Environment: {config.ENVIRONMENT if hasattr(config, 'ENVIRONMENT') else 'development'}")
+    print(f"🔐 API v1 endpoints available at /api/v1")
     print(f"⛓️  Blockchain Mode: {blockchain.mode.value}")
     if blockchain.contracts_available:
         print(f"✅ Smart Contracts Ready")

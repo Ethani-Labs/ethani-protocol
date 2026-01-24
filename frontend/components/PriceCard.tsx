@@ -1,7 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { calculatePrice, PriceResult } from '@/lib/api';
+
+// Demo mode: Using local interface instead of deprecated API
+interface PriceResult {
+  region: string;
+  base_price: number;
+  supply: number;
+  demand: number;
+  final_price: number;
+  reason: string;
+  method: string;
+  ai_used: boolean;
+}
 
 interface PriceCardProps {
   title?: string;
@@ -13,22 +24,65 @@ export default function PriceCard({ title = "Price Calculator", onPriceCalculate
   const [demand, setDemand] = useState<number>(150);
   const [basePrice, setBasePrice] = useState<number>(100);
   const [seasonFactor, setSeasonFactor] = useState<number>(1.0);
-  
+
   const [result, setResult] = useState<PriceResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // DEMO MODE: Calculate price locally with mock logic
+  const calculatePriceLocally = () => {
+    if (supply === 0) {
+      return {
+        region: 'Demo Region',
+        base_price: basePrice,
+        supply,
+        demand,
+        final_price: basePrice,
+        reason: 'No supply available - using base price',
+        method: 'Rule-based (Demo Mode)',
+        ai_used: false,
+      };
+    }
+
+    const ratio = demand / supply;
+    let finalPrice = basePrice;
+    let reason = '';
+
+    if (ratio >= 1.3) {
+      finalPrice = Math.round(basePrice * 1.15 * seasonFactor);
+      reason = 'Critical shortage - demand far exceeds supply (+15%)';
+    } else if (ratio >= 1.1) {
+      finalPrice = Math.round(basePrice * 1.08 * seasonFactor);
+      reason = 'Shortage - demand exceeds supply (+8%)';
+    } else if (ratio <= 0.8) {
+      finalPrice = Math.round(basePrice * 0.9 * seasonFactor);
+      reason = 'Surplus - supply exceeds demand (-10%)';
+    } else {
+      finalPrice = Math.round(basePrice * seasonFactor);
+      reason = 'Balanced - supply and demand in equilibrium (0%)';
+    }
+
+    return {
+      region: 'Demo Region',
+      base_price: basePrice,
+      supply,
+      demand,
+      final_price: finalPrice,
+      reason,
+      method: 'Rule-based (Demo Mode)',
+      ai_used: false,
+    };
+  };
 
   const handleCalculate = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const res = await calculatePrice({
-        supply,
-        demand,
-        base_price: basePrice,
-        season_factor: seasonFactor,
-      });
+      // Simulate API delay for demo
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const res = calculatePriceLocally();
 
       setResult(res);
       if (onPriceCalculated) {

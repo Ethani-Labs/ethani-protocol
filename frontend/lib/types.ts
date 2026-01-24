@@ -273,7 +273,7 @@ export interface CartItem {
   qty: number;
 }
 
-export interface Order {
+export interface CartOrder {
   id: string;
   items: CartItem[];
   total: number;
