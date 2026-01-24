@@ -104,6 +104,18 @@ The Stylus contract (Rust/WASM) is live on Arbitrum Sepolia and actively used by
 
 ---
 
+## Why Arbitrum & Stylus
+
+ETHANI is built on Arbitrum to ensure low-cost execution, fast computation, and long-term scalability for real-world economic systems.
+
+- **Low-cost execution:** Frequent price calculations remain affordable on Arbitrum without sacrificing Ethereum security.
+- **Deterministic computation:** Stylus enables high-performance, rule-based pricing logic without AI or randomness.
+- **Stylus performance:** Compute-heavy pricing logic runs significantly faster and cheaper compared to Solidity-only execution.
+- **Clear separation of concerns:** Stylus handles pure computation, while Solidity manages governance and state.
+- **Orbit expansion path:** ETHANI is designed to scale into Arbitrum Orbit chains for region-specific food systems while sharing a common pricing engine.
+
+---
+
 ## 📂 Repository Structure
 
 - **`contracts/`** — Smart contracts (Solidity + Stylus-ready, deployed on Arbitrum Sepolia)
