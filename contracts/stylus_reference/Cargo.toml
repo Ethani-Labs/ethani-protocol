@@ -1,0 +1,32 @@
+[package]
+name = "ethani-pricing-stylus"
+version = "1.0.0"
+edition = "2021"
+authors = ["ETHANI Labs"]
+description = "Rule-based food price stabilization on Arbitrum Stylus"
+license = "MIT"
+
+[dependencies]
+stylus-sdk = "0.6.1"
+alloy-primitives = "0.8"
+alloy-sol-types = "0.8"
+
+[lib]
+crate-type = ["cdylib"]
+
+[[example]]
+name = "ethani"
+path = "examples/ethani.rs"
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Link-time optimization
+codegen-units = 1   # Single codegen for better optimization
+strip = true        # Strip symbols
+
+[profile.dev]
+opt-level = 0
+
+# Stylus compilation target
+[target.wasm32-unknown-unknown]
+runner = "cargo-stylus"
