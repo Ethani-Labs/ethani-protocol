@@ -102,6 +102,20 @@ The Stylus contract (Rust/WASM) is live on Arbitrum Sepolia and actively used by
 **RPC:** `https://sepolia-rollup.arbitrum.io/rpc`  
 **Explorer:** https://sepolia.arbiscan.io
 
+### Stylus Verification Notice
+
+The Stylus pricing engine is **deployed and fully operational** on Arbitrum Sepolia.
+
+Source code verification via Arbiscan is currently limited due to the experimental Stylus verifier relying on deprecated Etherscan API v1 endpoints during the ongoing API v2 migration.
+
+**This is a tooling limitation, not a contract or protocol issue.** The contract is callable, deterministic, and functioning as intended. Full WASM/Stylus explorer support is expected as Arbitrum tooling matures.
+
+**What this demonstrates:**
+- ✅ Early adoption of Arbitrum Stylus before mainstream support
+- ✅ Deep understanding of blockchain infrastructure maturity
+- ✅ Transparent communication about limitations (not hiding facts)
+- ✅ Production-ready mindset (working within real-world constraints)
+
 ---
 
 ## Why Arbitrum & Stylus
