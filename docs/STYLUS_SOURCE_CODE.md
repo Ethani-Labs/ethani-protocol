@@ -15,20 +15,155 @@ Status: ✅ Operational
 ```
 contracts/stylus_reference/
 ├── Cargo.toml                 # Dependencies & project config
+├── Cargo.lock                 # Dependency lock file
 ├── README.md                  # Full documentation
 ├── build.sh                   # Build script (chmod +x build.sh)
 ├── src/
 │   └── lib.rs                # Main contract implementation
-└── examples/
-    └── ethani.rs             # Usage examples & scenarios
+├── examples/
+│   └── ethani.rs             # Usage examples & scenarios
+├── tests/                     # Integration tests
+├── target/                    # Compiled WASM output
+└── .gitignore
 ```
 
-## 🔗 File Locations
+---
 
-- **Main Contract:** [src/lib.rs](../stylus_reference/src/lib.rs)
-- **Dependencies:** [Cargo.toml](../stylus_reference/Cargo.toml)
-- **Build Guide:** [README.md](../stylus_reference/README.md)
-- **Examples:** [examples/ethani.rs](../stylus_reference/examples/ethani.rs)
+## 🧭 Quick Navigation Guide
+
+**Untuk Pemula (Just Starting):**
+1. Start: [`README.md`](../stylus_reference/README.md) - Build & deploy instructions
+2. Then: [`src/lib.rs`](../stylus_reference/src/lib.rs) - Read the actual contract code
+3. Check: [`examples/ethani.rs`](../stylus_reference/examples/ethani.rs) - See how to use it
+
+**Untuk Developers (Contributing Code):**
+1. Check: [`Cargo.toml`](../stylus_reference/Cargo.toml) - Understand dependencies
+2. Study: [`src/lib.rs`](../stylus_reference/src/lib.rs) - Contract logic
+3. Test: Run `cargo test` - Verify changes
+4. Reference: [`build.sh`](../stylus_reference/build.sh) - Build process
+
+**Untuk Deployers (Going to Mainnet):**
+1. Read: [`README.md`](../stylus_reference/README.md) - Full deployment guide
+2. Check: `build.sh` - Build process
+3. Review: [`STYLUS_VERIFICATION_GUIDE.md`](./STYLUS_VERIFICATION_GUIDE.md) - Verification steps
+4. Execute: Deploy commands
+
+---
+
+## 📖 What's in Each File?
+
+### 📄 Cargo.toml
+**Purpose:** Rust project configuration & dependencies
+
+**Contains:**
+- Project metadata (name, version, edition)
+- Dependencies (stylus-sdk, etc.)
+- Build settings (optimizations)
+- Target configuration (WASM)
+
+**When to look here:**
+- Adding new dependencies
+- Understanding project version
+- Checking Rust edition & features
+
+---
+
+### 📄 src/lib.rs
+**Purpose:** ⭐ **THE MAIN CONTRACT** - Pure Rust implementation
+
+**Contains:**
+- `PriceResult` struct (data structure)
+- `EthaniPricing` contract (main contract)
+- Core functions:
+  - `calculate_price()` - Main calculation
+  - `determine_tier()` - Pricing tier logic
+  - `apply_safety_limits()` - Safety caps
+  - `set_paused()` / `is_paused()` - Emergency control
+- Unit tests (6 tests covering all scenarios)
+
+**Size:** ~500 lines of Rust code
+**When to look here:**
+- Understanding pricing logic
+- Modifying calculation rules
+- Adding features
+- Reviewing security logic
+
+---
+
+### 📄 examples/ethani.rs
+**Purpose:** Usage examples & test scenarios
+
+**Contains:**
+- Example calls to the contract
+- Different market conditions (shortage, surplus, balanced)
+- Integration patterns
+- Expected output examples
+
+**When to look here:**
+- Learning how to call the contract
+- Testing locally
+- Understanding inputs/outputs
+- Creating new tests
+
+---
+
+### 📄 README.md
+**Purpose:** Complete documentation for the Stylus project
+
+**Contains:**
+- Setup instructions
+- Build steps
+- Test commands
+- Deployment procedures
+- Troubleshooting
+
+**When to look here:**
+- Getting started
+- Building the contract
+- Deploying to Arbitrum
+- Understanding build process
+
+---
+
+### 📄 build.sh
+**Purpose:** Automated build script
+
+**Contains:**
+- Environment setup
+- Rust compilation commands
+- WASM optimization
+- Output verification
+
+**How to use:**
+```bash
+cd contracts/stylus_reference
+chmod +x build.sh
+./build.sh
+```
+
+---
+
+### 📁 tests/
+**Purpose:** Integration tests (if present)
+
+**Contains:**
+- More comprehensive tests than unit tests
+- Real transaction simulation
+- Gas usage verification
+
+---
+
+### 📁 target/
+**Purpose:** Build output directory (auto-generated)
+
+**Contains:**
+- Compiled WASM binary (~50KB optimized)
+- Intermediate build artifacts
+- Debug information
+
+**Note:** Safe to delete - will be regenerated on next build
+
+---
 
 ---
 
