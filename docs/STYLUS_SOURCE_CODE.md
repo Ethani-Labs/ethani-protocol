@@ -31,18 +31,18 @@ contracts/stylus_reference/
 
 ## 🧭 Quick Navigation Guide
 
-**Untuk Pemula (Just Starting):**
+**For Beginners (Just Starting):**
 1. Start: [`README.md`](../stylus_reference/README.md) - Build & deploy instructions
 2. Then: [`src/lib.rs`](../stylus_reference/src/lib.rs) - Read the actual contract code
 3. Check: [`examples/ethani.rs`](../stylus_reference/examples/ethani.rs) - See how to use it
 
-**Untuk Developers (Contributing Code):**
+**For Developers (Contributing Code):**
 1. Check: [`Cargo.toml`](../stylus_reference/Cargo.toml) - Understand dependencies
 2. Study: [`src/lib.rs`](../stylus_reference/src/lib.rs) - Contract logic
 3. Test: Run `cargo test` - Verify changes
 4. Reference: [`build.sh`](../stylus_reference/build.sh) - Build process
 
-**Untuk Deployers (Going to Mainnet):**
+**For Deployers (Going to Mainnet):**
 1. Read: [`README.md`](../stylus_reference/README.md) - Full deployment guide
 2. Check: `build.sh` - Build process
 3. Review: [`STYLUS_VERIFICATION_GUIDE.md`](./STYLUS_VERIFICATION_GUIDE.md) - Verification steps
@@ -472,7 +472,6 @@ fn determine_tier(&self, ratio: U256) -> (u8, u32, String) {
 | [src/lib.rs](../stylus_reference/src/lib.rs) | Contract source code |
 | [examples/ethani.rs](../stylus_reference/examples/ethani.rs) | Usage examples |
 | [STYLUS_VERIFICATION_GUIDE.md](./STYLUS_VERIFICATION_GUIDE.md) | Contract verification |
-| [ETHANI_PRICING_SYSTEM_EXPLAINED.md](./ETHANI_PRICING_SYSTEM_EXPLAINED.md) | Pricing logic |
 
 ---
 
