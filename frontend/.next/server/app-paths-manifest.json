@@ -1,9 +1,7 @@
 {
-  "/page": "app/page.js",
+  "/dashboard/governance/page": "app/dashboard/governance/page.js",
+  "/global-prices/page": "app/global-prices/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/stability-rules/page": "app/stability-rules/page.js",
-  "/dashboard/governance/page": "app/dashboard/governance/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/global-prices/page": "app/global-prices/page.js",
-  "/market/page": "app/market/page.js"
+  "/dashboard/prices/page": "app/dashboard/prices/page.js"
 }
