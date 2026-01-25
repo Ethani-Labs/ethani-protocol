@@ -57,7 +57,6 @@ from .models import (
     DetailedPriceResponse
 )
 from .config import config
-from .api.v1 import api_router
 
 app = FastAPI(
     title=config.API_TITLE,
@@ -74,9 +73,6 @@ app.add_middleware(
     allow_methods=config.CORS_ALLOW_METHODS,
     allow_headers=config.CORS_ALLOW_HEADERS,
 )
-
-# Include API v1 router
-app.include_router(api_router)
 
 # ========== ROOT ENDPOINT ==========
 
@@ -111,7 +107,101 @@ def root():
 def health_check() -> dict:
     """Health check endpoint"""
     return {
-        "status": "ok",
+        "status": "operational",
+        "service": "ETHANI Pricing API",
+        "timestamp": datetime.utcnow().isoformat(),
+        "ai_used": False,
+        "environment": config.ENVIRONMENT if hasattr(config, 'ENVIRONMENT') else None
+    }
+
+# ========== API v1 PRICING ENDPOINTS ==========
+
+@app.post("/api/v1/pricing/calculate")
+def calculate_price_v1(request: PriceRequest) -> dict:
+    """
+    API v1 Pricing Endpoint - Calculate fair food price.
+    
+    Request body:
+    {
+        "supply": 100,
+        "demand": 120,
+        "base_price": 10000,
+        "region": "ID"
+    }
+    
+    Response:
+    {
+        "success": true,
+        "data": {
+            "final_price": 10800,
+            "pricing_tier": 2,
+            "adjustment_percent": 8,
+            "explanation": "Shortage condition detected - price adjusted by +8%",
+            "ratio": 1.2,
+            "calculation_method": "rule_based",
+            "timestamp": "2026-01-25T..."
+        }
+    }
+    """
+    try:
+        # Validate inputs
+        is_valid, error_msg = validate_inputs(
+            request.supply,
+            request.demand,
+            request.base_price
+        )
+        if not is_valid:
+            return {
+                "success": False,
+                "error": error_msg
+            }
+        
+        # Calculate price using rule-based engine
+        result = calculate_price(
+            request.supply,
+            request.demand,
+            request.base_price,
+            getattr(request, 'season_factor', 1.0)
+        )
+        
+        # Get tier information
+        ratio_result = get_supply_demand_ratio(request.supply, request.demand)
+        
+        # Map tier number
+        tier_map = {
+            "critical_shortage": 1,
+            "shortage": 2,
+            "balanced": 3,
+            "surplus": 4
+        }
+        tier_num = tier_map.get(ratio_result['tier'], 3)
+        
+        # Calculate adjustment percent
+        adj_percent = round(((result['suggested_price'] - request.base_price) / request.base_price) * 100)
+        
+        return {
+            "success": True,
+            "data": {
+                "final_price": result['suggested_price'],
+                "pricing_tier": tier_num,
+                "adjustment_percent": adj_percent,
+                "explanation": result['reason'],
+                "ratio": ratio_result['ratio'],
+                "calculation_method": "rule_based",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@app.get("/health")
+def health_check() -> dict:
+    """Health check endpoint"""
+    return {
+        "status": "operational",
         "service": "ETHANI Pricing API",
         "timestamp": datetime.utcnow().isoformat(),
         "ai_used": False,
