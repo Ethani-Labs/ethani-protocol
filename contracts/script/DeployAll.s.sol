@@ -11,15 +11,22 @@ import {PriceOracle} from "../src/PriceOracle.sol";
 
 /**
  * @title DeployAll
- * @notice Complete deployment script for all ETHANI contracts
+ * @notice Complete deployment script for all ETHANI contracts on Arbitrum
  *
  * Prerequisites:
  * - Set PRIVATE_KEY environment variable
- * - Have testnet tokens for gas
+ * - Have testnet tokens for gas (ETH on Arbitrum Sepolia)
  *
- * Deploy to Mantle Testnet:
+ * Deploy to Arbitrum Sepolia (Testnet):
  * forge script script/DeployAll.s.sol \
- *     --rpc-url https://rpc.testnet.mantle.xyz \
+ *     --rpc-url https://sepolia-rollup.arbitrum.io/rpc \
+ *     --broadcast \
+ *     --verify \
+ *     -vvv
+ *
+ * Deploy to Arbitrum One (Mainnet):
+ * forge script script/DeployAll.s.sol \
+ *     --rpc-url https://arb1.arbitrum.io/rpc \
  *     --broadcast \
  *     --verify \
  *     -vvv
