@@ -6,6 +6,10 @@ Environment-specific settings and defaults.
 
 import os
 from typing import Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Config:
     """Base configuration"""
@@ -32,7 +36,12 @@ class Config:
     # Blockchain Settings
     BLOCKCHAIN_ENABLED = os.getenv("BLOCKCHAIN_ENABLED", "False").lower() == "true"
     BLOCKCHAIN_RPC_URL = os.getenv("BLOCKCHAIN_RPC_URL", "http://localhost:8545")
-    BLOCKCHAIN_NETWORK = os.getenv("BLOCKCHAIN_NETWORK", "mantle-testnet")
+    BLOCKCHAIN_NETWORK = os.getenv("ARBITRUM_NETWORK", "sepolia")
+    ARBITRUM_CHAIN_ID = int(os.getenv("ARBITRUM_CHAIN_ID", "421614"))
+    
+    # Contract Addresses (Arbitrum Sepolia)
+    ETHANI_PRICING_ADDRESS = os.getenv("ETHANI_PRICING_ADDRESS", "0xc92fd01c122821Eb2C911d16468B20b07E25abC0")
+    ETHANI_REGION_ADDRESS = os.getenv("ETHANI_REGION_ADDRESS", "0x5836cdDE4D05B0aBDB97AE556a0b9E3971a16143")
     
     # Logging
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
