@@ -11,11 +11,11 @@
 
 ### Backend API (Railway) ✅ LIVE
 ```
-https://independent-generosity-production.up.railway.app
+https://agile-quietude-production.up.railway.app
 ```
 
 **Status:** ✅ Operational  
-**Health Check:** https://independent-generosity-production.up.railway.app/health  
+**Health Check:** https://agile-quietude-production.up.railway.app/health  
 **Platform:** Railway  
 **Region:** Washington DC (iad1)  
 
