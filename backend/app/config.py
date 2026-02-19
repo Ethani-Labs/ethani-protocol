@@ -5,11 +5,20 @@ Environment-specific settings and defaults.
 """
 
 import os
+import json
 from typing import Optional
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
+
+
+def _parse_cors_origins(raw: str) -> list:
+    """Parse CORS origins from either JSON array or comma-separated string."""
+    raw = raw.strip()
+    if raw.startswith("["):
+        return json.loads(raw)
+    return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 class Config:
     """Base configuration"""
@@ -24,7 +33,7 @@ class Config:
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
     
     # CORS Settings
-    CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8000").split(",")
+    CORS_ORIGINS = _parse_cors_origins(os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8000"))
     CORS_ALLOW_CREDENTIALS = True
     CORS_ALLOW_METHODS = ["*"]
     CORS_ALLOW_HEADERS = ["*"]
