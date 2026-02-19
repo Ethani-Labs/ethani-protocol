@@ -183,29 +183,14 @@ ETHANI-Labs/
 
 ## 📚 Documentation
 
-For complete details, see [`docs/`](./docs/):
+**👉 Start here:** [docs/INDEX.md](./docs/INDEX.md) — Complete documentation index
 
-**Architecture & Design**
-- [architecture.md](./docs/architecture.md) — Full system design and component breakdown
-- [HYBRID_ARCHITECTURE.md](./docs/HYBRID_ARCHITECTURE.md) — Stylus + Solidity dual-layer design
-- [vision.md](./docs/vision.md) — Project mission and long-term strategy
-
-**Implementation Guides**
-- [BACKEND_SERVICE.md](./docs/BACKEND_SERVICE.md) — FastAPI backend and API routes
-- [FRONTEND.md](./docs/FRONTEND.md) — Next.js web interface
-- [SMART_CONTRACTS.md](./docs/SMART_CONTRACTS.md) — Smart contract reference
-
-**Pricing & Economics**
-- [pricing-model.md](./docs/pricing-model.md) — Deterministic pricing rules and formulas
-- [roadmap.md](./docs/roadmap.md) — Development roadmap and milestones
-
-**Deployment & Verification**
-- [DEPLOYMENT_STATUS.md](./docs/DEPLOYMENT_STATUS.md) — Contract addresses, network status, Stylus verification details
-- [DEPLOYMENT_RECORD.md](./docs/DEPLOYMENT_RECORD.md) — On-chain deployment details for judges/reviewers
-- [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) — Complete audit results (46 tests, 0 vulnerabilities, security assessment)
-- [INTEGRATION_TESTING.md](./docs/INTEGRATION_TESTING.md) — Comprehensive integration test documentation
-- [STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md) — Stylus contract verification and testing procedures
-- [STYLUS_SOURCE_CODE.md](./docs/STYLUS_SOURCE_CODE.md) — Stylus implementation reference
+For quick reference:
+- **Setup & Deployment**: [LOCAL_SETUP.md](./docs/LOCAL_SETUP.md) | [VERCEL_RAILWAY_DEPLOYMENT.md](./docs/VERCEL_RAILWAY_DEPLOYMENT.md)
+- **Architecture**: [architecture.md](./docs/architecture.md) | [HYBRID_ARCHITECTURE.md](./docs/HYBRID_ARCHITECTURE.md) | [vision.md](./docs/vision.md)
+- **API & Contracts**: [BACKEND_SERVICE.md](./docs/BACKEND_SERVICE.md) | [SMART_CONTRACTS.md](./docs/SMART_CONTRACTS.md) | [STYLUS_SOURCE_CODE.md](./docs/STYLUS_SOURCE_CODE.md)
+- **Verification**: [AUDIT_REPORT.md](./docs/AUDIT_REPORT.md) | [STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md)
+- **Economics**: [pricing-model.md](./docs/pricing-model.md) | [roadmap.md](./docs/roadmap.md)
 
 ## 🚀 Quick Start
 
@@ -486,6 +471,21 @@ Result: System reliability = 100%
 | **Verification** | [INTEGRATION_TESTING.md](./docs/INTEGRATION_TESTING.md) | Integration test documentation |
 | **Stylus** | [STYLUS_VERIFICATION_GUIDE.md](./docs/STYLUS_VERIFICATION_GUIDE.md) | Stylus verification and testing procedures |
 | **Stylus** | [STYLUS_SOURCE_CODE.md](./docs/STYLUS_SOURCE_CODE.md) | Stylus contract implementation reference |
+
+---
+
+## 🌐 Live Deployment (Production)
+
+| Service | URL | Status |
+|---------|-----|--------|
+| **Frontend** | https://ethani-frontend.vercel.app | ✅ Live |
+| **Backend API** | https://agile-quietude-production.up.railway.app | ✅ Live |
+| **Health Check** | https://agile-quietude-production.up.railway.app/health | ✅ Operational |
+| **Block Explorer** | https://sepolia.arbiscan.io | ✅ Available |
+
+**Repositories**:
+- Backend: https://github.com/maniknur/Ethani-Backend
+- Frontend: https://github.com/maniknur/Ethani-Frontend
 
 ---
 
